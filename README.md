@@ -200,6 +200,39 @@ The available course formats are:
 - online
 
 ----
+## Execution of business logic:
+
+1. __Admin:__
+- AdminController: A controller used for administrative operations that include managing users, applications, setting access rights, and more.
+
+- AdminService: Contains logic related to administrative operations. Includes user management, application management, access rights, and other administrative functions.
+
+- AdminModule: Combines AdminController and AdminService. Used to inject AdminService into the controller and register the corresponding routes.
+
+2. __Application:__
+- ApplicationController: The controller that handles application operations. This includes creating a new application, retrieving the application list, updating the application status, etc.
+
+- ApplicationService: Contains the logic associated with applications. This includes operations for creating, retrieving, and updating applications, as well as working with application statuses.
+
+- ApplicationModule: Combines ApplicationController and ApplicationService. It is used to inject the ApplicationService into the controller and register the corresponding routes.
+
+3. __Auth:__
+- AuthController: A controller for user authentication and authorization. This controller will contain operations such as registration, login, logout, session management, etc.
+
+- AuthService: Responsible for user authentication and authorization. Includes registration, login, logout, session management, and other related functions.
+
+- AuthModule: Combines AuthController and AuthService. It is used to inject AuthService into the controller and register the corresponding routes.
+
+4. __User:__
+- UserController: A controller that is responsible for user-related operations such as creating a new user, retrieving user data, updating a profile, etc.
+
+- UserService: Responsible for user-related logic. This includes operations for creating, retrieving, and updating users, as well as managing their profiles.
+
+- UserModule: Combines UserController and UserService. It is used to inject UserService into the controller and register the corresponding routes.
+
+Routing is configured to associate URLs with the appropriate controllers and methods.
+
+----
 ## Postman help
 To make a request in Postman, you can follow these steps:
 
