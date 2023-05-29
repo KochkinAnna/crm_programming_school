@@ -1,6 +1,6 @@
 -- AlterTable
 ALTER TABLE `orders` ADD COLUMN `groupId` INTEGER NULL,
-    ADD COLUMN `roleId` ENUM('ADMIN', 'MANAGER') NULL,
+    ADD COLUMN `role` ENUM('ADMIN', 'MANAGER') NULL,
     ADD COLUMN `userId` INTEGER NULL;
 
 -- CreateTable

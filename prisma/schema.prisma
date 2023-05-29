@@ -27,7 +27,7 @@ model Order {
   utm           String?
   msg           String?
   manager       User?     @relation("ManagerToOrder", fields: [userId], references: [id])
-  roleId        Role?
+  roleId        Role?     @map("role")
   userId        Int?
 
   @@map("orders")
