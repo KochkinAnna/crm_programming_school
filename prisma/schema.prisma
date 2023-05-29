@@ -18,51 +18,43 @@ model Order {
   course        String?
   course_format String?
   course_type   String?
+  status        String?
   sum           Int?
   alreadyPaid   Int?
+  group         Group?    @relation(fields: [groupId], references: [id])
+  groupId       Int?
   created_at    DateTime?
   utm           String?
   msg           String?
-  status        String?
-  manager       User?     @relation("ManagerToOrder", fields: [managerId], references: [id])
-  managerId     Int?
-  group         Group?    @relation("OrderToGroup", fields: [groupId], references: [id])
-  groupId       Int?
+  manager       User?     @relation("ManagerToOrder", fields: [userId], references: [id])
+  roleId        Role?
+  userId        Int?
 
   @@map("orders")
 }
 
 model Group {
-  id             Int     @id @default(autoincrement())
-  name           String?
-  orders         Order[] @relation("OrderToGroup")
-  user           User?   @relation("ManagerToGroup", fields: [userId], references: [id])
-  userId         Int?
-  managedMembers User[]  @relation("MemberToGroup")
+  id     Int     @id @default(autoincrement())
+  name   String? @unique
+  orders Order[]
 
   @@map("groups")
 }
 
-model Role {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  user User[]
-
-  @@map("roles")
+enum Role {
+  ADMIN
+  MANAGER
 }
 
 model User {
-  id             Int     @id @default(autoincrement())
-  email          String  @unique
-  password       String
-  role           Role    @relation(fields: [roleId], references: [id])
-  roleId         Int
-  firstName      String?
-  lastName       String?
-  phone          String?
-  managedOrders  Order[] @relation("ManagerToOrder")
-  managedGroups  Group[] @relation("ManagerToGroup")
-  memberOfGroups Group[] @relation("MemberToGroup")
+  id            Int     @id @default(autoincrement())
+  email         String  @unique
+  password      String
+  role          Role
+  firstName     String?
+  lastName      String?
+  phone         String?
+  managedOrders Order[] @relation("ManagerToOrder")
 
   @@map("users")
 }
