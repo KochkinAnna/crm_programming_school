@@ -4,7 +4,7 @@ import { OrderService } from './order.service';
 import { PaginatedOrders } from '../common/interface/paginatedOrders.interface';
 
 class PaginatedOrdersResponse {
-  constructor(public readonly data: PaginatedOrders) {} //The @ApiResponse decorator uses this wrapper class instead of directly using the PaginatedOrders interface (since it is used as a value, not a type)
+  constructor(public readonly data: PaginatedOrders) {} //The @ApiResponse decorator uses this wrapper class instead of directly using the PaginatedOrders interface (since it is used as a value, not a type) / (Декоратор @ApiResponse  використовує цей клас-обгортку замість безпосереднього використання інтерфейсу PaginatedOrders (оскільки він використовується як значення, а не тип))
 }
 
 @Controller('orders')
