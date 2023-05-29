@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("DATABASE_SHADOW_URL")
+}
+
+model Order {
+  id            Int       @id @default(autoincrement())
+  name          String?
+  surname       String?
+  email         String?
+  phone         String?
+  age           Int?
+  course        String?
+  course_format String?
+  course_type   String?
+  sum           Int?
+  alreadyPaid   Int?
+  created_at    DateTime?
+  utm           String?
+  msg           String?
+  status        String?
+  manager       User?     @relation("ManagerToOrder", fields: [managerId], references: [id])
+  managerId     Int?
+  group         Group?    @relation("OrderToGroup", fields: [groupId], references: [id])
+  groupId       Int?
+
+  @@map("orders")
+}
+
+model Group {
+  id             Int     @id @default(autoincrement())
+  name           String?
+  orders         Order[] @relation("OrderToGroup")
+  user           User?   @relation("ManagerToGroup", fields: [userId], references: [id])
+  userId         Int?
+  managedMembers User[]  @relation("MemberToGroup")
+
+  @@map("groups")
+}
+
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+  user User[]
+
+  @@map("roles")
+}
+
+model User {
+  id             Int     @id @default(autoincrement())
+  email          String  @unique
+  password       String
+  role           Role    @relation(fields: [roleId], references: [id])
+  roleId         Int
+  firstName      String?
+  lastName       String?
+  phone          String?
+  managedOrders  Order[] @relation("ManagerToOrder")
+  managedGroups  Group[] @relation("ManagerToGroup")
+  memberOfGroups Group[] @relation("MemberToGroup")
+
+  @@map("users")
+}

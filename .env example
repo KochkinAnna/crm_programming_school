@@ -1,0 +1,1 @@
+DATABASE_URL="mysql://usernsme:password@owu.linkpc.net:3306/crm?schema=public"
