@@ -1,1 +1,2 @@
-DATABASE_URL="mysql://usernsme:password@owu.linkpc.net:3306/crm?schema=public"
+DATABASE_URL="mysql://username:password@owu.linkpc.net:3306/dbname?schema=public"
+DATABASE_SHADOW_URL="mysql://username:password@owu.linkpc.net:3306/dbname?createDatabaseIfNotExist=true&schema=public"
