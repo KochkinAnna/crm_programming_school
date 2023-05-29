@@ -208,7 +208,7 @@ To make a request in Postman, you can follow these steps:
 3. Customize any necessary headers or parameters for the request.
 4. Click the Send button (or press the Enter hotkey) to send the request.<p> Remember that you must have the server running on your `http://localhost:<PORT>` to successfully connect and receive a response.</p>
 
-Here is the link for the postman: __ВСТАВИТИ__
+Here is the link for the postman: https://api.postman.com/collections/25901530-faedb7f6-91d1-486a-81d8-0f44b0528465?access_key=PMAT-01H1MG0HV42PSQJS3Q4Q40G92X
 
 ----
 ## Stay in touch
