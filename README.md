@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://localhost:3000/" target="blank"><img src="https://i.pinimg.com/564x/94/2d/4a/942d4a0d8dba0da5fa359b9d76a73c3b.jpg" width="600" alt="Project Logo_ CRM Programming school" /></a>
+  <a href="http://localhost:3000/api/doc" target="blank"><img src="https://i.pinimg.com/564x/94/2d/4a/942d4a0d8dba0da5fa359b9d76a73c3b.jpg" width="600" alt="Project Logo_ CRM Programming school" /></a>
 </p>
 
 _<p align="center"> Welcome to the backend of CRM Programming School! This project serves as the backend component of the CRM system, providing a robust and efficient API for managing student applications and inquiries. Powered by Nest.js, TypeScript, and integrated with MySQL database, this backend solution offers seamless data storage and retrieval.</p>_
