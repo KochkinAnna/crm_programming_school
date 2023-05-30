@@ -16,6 +16,7 @@ import { GroupService } from './group/group.service';
 import { GroupModule } from './group/group.module';
 import { PasswordService } from './password/password.service';
 import { PasswordModule } from './password/password.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [AuthModule, OrderModule, UserModule, GroupModule, PasswordModule],
@@ -26,6 +27,14 @@ import { PasswordModule } from './password/password.module';
     UserController,
     GroupController,
   ],
-  providers: [AppService, AuthService, OrderService, UserService, GroupService, PasswordService],
+  providers: [
+    AppService,
+    AuthService,
+    OrderService,
+    UserService,
+    GroupService,
+    PasswordService,
+    JwtService,
+  ],
 })
 export class AppModule {}

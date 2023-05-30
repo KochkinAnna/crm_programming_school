@@ -8,7 +8,7 @@ import { PasswordService } from '../password/password.service';
 export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly passwordService: PasswordService,
+    public readonly passwordService: PasswordService,
   ) {}
 
   async createUser(userData: CreateUserDto): Promise<User> {
