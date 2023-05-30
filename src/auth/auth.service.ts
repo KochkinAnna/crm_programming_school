@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './strategy/constants';
 import { User } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
-import { adminCredentials } from '../common/credential/admin-credential';
+import { adminCredential } from '../common/credential/admin-credential';
 
 @Injectable()
 export class AuthService {
@@ -14,13 +14,10 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User | null> {
-    if (
-      email === adminCredentials.email &&
-      pass === adminCredentials.password
-    ) {
+    if (email === adminCredential.email && pass === adminCredential.password) {
       const adminUser: Partial<User> = {
-        email: adminCredentials.email,
-        password: adminCredentials.password,
+        email: adminCredential.email,
+        password: adminCredential.password,
       };
 
       return adminUser as User;
