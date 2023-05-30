@@ -14,11 +14,6 @@ export class LoginDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ name: 'role', enum: Role })
-  @IsString()
-  @IsNotEmpty()
-  role: Role;
-
   @ApiProperty({
     name: 'password',
     required: true,
