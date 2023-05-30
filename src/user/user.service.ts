@@ -26,4 +26,12 @@ export class UserService {
       },
     });
   }
+
+  async getUsers(): Promise<User[]> {
+    return this.prismaService.user.findMany();
+  }
+
+  async getUserByEmail(email: string): Promise<User | null> {
+    return this.prismaService.user.findUnique({ where: { email } });
+  }
 }
