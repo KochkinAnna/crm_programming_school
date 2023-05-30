@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="http://localhost:3000/api/doc" target="blank"><img src="https://i.pinimg.com/564x/94/2d/4a/942d4a0d8dba0da5fa359b9d76a73c3b.jpg" width="600" alt="Project Logo_ CRM Programming school" /></a>
+  <a href="http://localhost:5000/api/doc" target="blank"><img src="https://i.pinimg.com/564x/94/2d/4a/942d4a0d8dba0da5fa359b9d76a73c3b.jpg" width="600" alt="Project Logo_ CRM Programming school" /></a>
 </p>
 
 _<p align="center"> Welcome to the backend of CRM Programming School! This project serves as the backend component of the CRM system, providing a robust and efficient API for managing student applications and inquiries. Powered by Nest.js, TypeScript, and integrated with MySQL database, this backend solution offers seamless data storage and retrieval.</p>_
@@ -50,49 +50,15 @@ git clone <repository-url>
 
 Replace <repository-url> with the actual URL of the project repository.
 
-2. Navigate to the project directory:
 
-```
-cd crm
-```
-
-3. Install the project dependencies:
+2. Install the project dependencies:
 
 ```
 npm install
 ```
 
-4. Create a configuration file named `.env` in the project's root directory and set the required environment variables. Here's an example of the .env file:
 
-```
-# Configuration for MongoDB Atlas
-MONGO_URI=<MongoDB Atlas connection URI>
-
-# Configuration for MySQL
-MYSQL_HOST=<MySQL server host>
-MYSQL_PORT=<MySQL server port>
-MYSQL_USER=<MySQL user>
-MYSQL_PASSWORD=<MySQL user password>
-MYSQL_DATABASE=<database name>
-
-# Server configuration
-PORT=<server port>
-```
-
-Replace the values according to your own configuration.
-
-5. We are utilizing the Prisma CLI. As a best practice, it's recommended to invoke the CLI locally by prefixing it with npx: 
-
-```
-npx prisma
-```
-Now create your initial Prisma setup using the init command of the Prisma CLI: 
-
-```
-npx prisma init
-```
-
-6. Start the server:
+3. Start the server:
 
 ```
 npm run start
@@ -100,7 +66,7 @@ npm run start
 
 Once the server is successfully running, you will see a message indicating its status.
 
-6. Open your web browser and access the following URL:
+4. Open your web browser and access the following URL:
 
 ```
 http://localhost:<PORT>
@@ -108,17 +74,8 @@ http://localhost:<PORT>
 
 Replace `<PORT>` with the port number you specified in the `.env` configuration file.
 
-7. Enjoy the application :)
+5. Enjoy the application :)
 
-----
-## Database Migration
-
-The project utilizes database migration to set up the necessary schemas and tables. To perform the migration, execute the following command:
-
-```
-npm run migration:run
-```
-This command will create the required tables in the MySQL database.
 
 ----
 ## Project Details
@@ -169,35 +126,6 @@ Clicking the "EDIT" button opens a modal window with an edit form:
 - The form include functionality to add a new group directly from the form (the group name must be unique).
 - Performed validation.
 
-The available statuses (Status) are:
-
-- In Work
-- New
-- Aggre
-- Disaggre
-- Dubbing
-
-The available courses are:
-
-- FS
-- QACX
-- JCX
-- JSCX
-- FE
-- PCX
-
-The available course types are:
-
-- pro
-- minimal
-- premium
-- incubator
-- vip
-
-The available course formats are:
-
-- static
-- online
 
 ----
 ## Postman help
@@ -210,6 +138,8 @@ To make a request in Postman, you can follow these steps:
 
 Here is the link for the postman:    
 https://api.postman.com/collections/25901530-faedb7f6-91d1-486a-81d8-0f44b0528465?access_key=PMAT-01H1MG0HV42PSQJS3Q4Q40G92X
+
+
 ----
 ## Stay in touch
 - Author - [Anna Kochkina](https://github.com/KochkinAnna)
