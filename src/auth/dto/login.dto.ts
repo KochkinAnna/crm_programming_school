@@ -1,6 +1,6 @@
-import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { ERole } from '../../common/enum/role.enum';
+import { Role } from '@prisma/client';
 
 export class LoginDto {
   @ApiProperty({
@@ -14,10 +14,10 @@ export class LoginDto {
   @IsEmail()
   email: string;
 
-  @ApiProperty({ name: 'role', enum: ERole })
+  @ApiProperty({ name: 'role', enum: Role })
   @IsString()
   @IsNotEmpty()
-  role: ERole;
+  role: Role;
 
   @ApiProperty({
     name: 'password',

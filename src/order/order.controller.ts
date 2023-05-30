@@ -9,8 +9,8 @@ import { OrderService } from './order.service';
 import { PaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
 
-@Controller('orders')
-@ApiTags('Orders')
+@Controller('order')
+@ApiTags('Order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 

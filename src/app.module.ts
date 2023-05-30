@@ -14,9 +14,11 @@ import { UserModule } from './user/user.module';
 import { GroupController } from './group/group.controller';
 import { GroupService } from './group/group.service';
 import { GroupModule } from './group/group.module';
+import { PasswordService } from './password/password.service';
+import { PasswordModule } from './password/password.module';
 
 @Module({
-  imports: [AuthModule, OrderModule, UserModule, GroupModule],
+  imports: [AuthModule, OrderModule, UserModule, GroupModule, PasswordModule],
   controllers: [
     AppController,
     AuthController,
@@ -24,6 +26,6 @@ import { GroupModule } from './group/group.module';
     UserController,
     GroupController,
   ],
-  providers: [AppService, AuthService, OrderService, UserService, GroupService],
+  providers: [AppService, AuthService, OrderService, UserService, GroupService, PasswordService],
 })
 export class AppModule {}
