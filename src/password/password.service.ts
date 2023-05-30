@@ -9,11 +9,14 @@ export class PasswordService {
     this.salt = parseInt(process.env.SALT, 10);
   }
 
-  async hashPassword(password: string) {
+  async hashPassword(password: string): Promise<string> {
     return bcrypt.hash(password, this.salt);
   }
 
-  async comparePasswords(password: string, hashedPassword: string) {
+  async comparePasswords(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
     return bcrypt.compare(password, hashedPassword);
   }
 }
