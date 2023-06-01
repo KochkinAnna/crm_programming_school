@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UseGuards } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
+import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class OrderService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   async getPaginatedOrders(
     page = 1,
     limit = 25,

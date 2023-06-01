@@ -78,12 +78,12 @@ export class AuthService {
       });
 
       if (!decoded?.refreshToken) {
-        return new BadRequestException('Invalid refresh token');
+        throw new BadRequestException('Invalid refresh token');
       }
 
       const user = await this.userService.getUserByEmail(decoded.username);
       if (!user) {
-        return new BadRequestException('User not found');
+        throw new BadRequestException('User not found');
       }
 
       const accessTokenPayload: ITokenPayload = {
