@@ -27,4 +27,16 @@ export class AuthController {
       throw new BadRequestException('Invalid login data');
     }
   }
+
+  @ApiOperation({ summary: 'Refresh Token' })
+  @ApiBody({ description: 'Refresh token' })
+  @ApiResponse({ status: 200, description: 'Successful token refresh' })
+  @Post('/refresh-token')
+  async refreshTokens(@Body('refreshToken') refreshToken: string) {
+    try {
+      return await this.authService.refreshTokens(refreshToken);
+    } catch (error) {
+      throw new BadRequestException('Invalid refresh token');
+    }
+  }
 }

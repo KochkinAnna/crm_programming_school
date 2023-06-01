@@ -5,6 +5,7 @@ import { jwtConstants } from './strategy/constants';
 import { User } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { adminCredential } from '../common/credential/admin-credential';
+import { ITokenPayload } from '../common/interface/tokenPayload.interface';
 
 @Injectable()
 export class AuthService {
@@ -44,11 +45,61 @@ export class AuthService {
     const { email, password } = loginDto;
     const user = await this.validateUser(email, password);
 
-    const payload = { username: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload, {
-        secret: jwtConstants.secret,
-      }),
+    const accessTokenPayload: ITokenPayload = {
+      username: user.email,
+      sub: user.id,
     };
+    const refreshTokenPayload: ITokenPayload = {
+      username: user.email,
+      sub: user.id,
+      refreshToken: true,
+    };
+
+    const accessToken = this.jwtService.sign(accessTokenPayload, {
+      secret: jwtConstants.secret,
+      expiresIn: jwtConstants.accessTokenExpiresIn,
+    });
+
+    const refreshToken = this.jwtService.sign(refreshTokenPayload, {
+      secret: jwtConstants.secret,
+      expiresIn: jwtConstants.refreshTokenExpiresIn,
+    });
+
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    try {
+      const decoded = this.jwtService.verify(refreshToken, {
+        secret: jwtConstants.secret,
+      });
+
+      if (!decoded?.refreshToken) {
+        return new BadRequestException('Invalid refresh token');
+      }
+
+      const user = await this.userService.getUserByEmail(decoded.username);
+      if (!user) {
+        return new BadRequestException('User not found');
+      }
+
+      const accessTokenPayload: ITokenPayload = {
+        username: user.email,
+        sub: user.id,
+      };
+      const newAccessToken = this.jwtService.sign(accessTokenPayload, {
+        secret: jwtConstants.secret,
+        expiresIn: jwtConstants.accessTokenExpiresIn,
+      });
+
+      return {
+        access_token: newAccessToken,
+      };
+    } catch (error) {
+      throw new BadRequestException('Invalid refresh token');
+    }
   }
 }

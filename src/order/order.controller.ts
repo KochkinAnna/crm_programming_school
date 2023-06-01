@@ -6,7 +6,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { OrderService } from './order.service';
-import { PaginatedOrders } from '../common/interface/paginatedOrders.interface';
+import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
 
 @Controller('order')
@@ -26,7 +26,7 @@ export class OrderController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('sort') sort: 'asc' | 'desc',
-  ): Promise<PaginatedOrders> {
+  ): Promise<IPaginatedOrders> {
     page = page ? +page : 1;
     limit = limit ? +limit : 25;
     sort = sort === 'asc' ? 'asc' : 'desc';
