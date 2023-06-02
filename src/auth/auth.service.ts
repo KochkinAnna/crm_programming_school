@@ -71,11 +71,15 @@ export class AuthService {
     };
   }
 
-  async refreshTokens(refreshToken: string) {
+  async refreshToken(refreshToken: string) {
     try {
+      console.log('Received refresh token:', refreshToken);
+
       const decoded = this.jwtService.verify(refreshToken, {
         secret: jwtConstants.secret,
       });
+
+      console.log('Decoded token:', decoded);
 
       if (!decoded?.refreshToken) {
         throw new BadRequestException('Invalid refresh token');
@@ -99,6 +103,7 @@ export class AuthService {
         access_token: newAccessToken,
       };
     } catch (error) {
+      console.log('Error:', error);
       throw new BadRequestException('Invalid refresh token');
     }
   }
