@@ -8,6 +8,8 @@ import {
 import { OrderService } from './order.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
+import { SortBy } from '../common/type/sortBy.type';
+import { ESortBy } from '../common/enum/sortBy.enum';
 
 @Controller('order')
 @ApiTags('Order')
@@ -19,6 +21,11 @@ export class OrderController {
   @ApiQuery({ name: 'page', type: Number, example: 1 })
   @ApiQuery({ name: 'limit', type: Number, example: 25 })
   @ApiQuery({ name: 'sort', enum: ['asc', 'desc'], example: 'desc' })
+  @ApiQuery({
+    name: 'sortBy',
+    enum: Object.values(ESortBy),
+    example: ESortBy.Id,
+  })
   @ApiOkResponse({
     schema: paginatedOrdersResponse,
   })
@@ -26,11 +33,17 @@ export class OrderController {
     @Query('page') page: number,
     @Query('limit') limit: number,
     @Query('sort') sort: 'asc' | 'desc',
+    @Query('sortBy') sortBy: SortBy,
   ): Promise<IPaginatedOrders> {
     page = page ? +page : 1;
     limit = limit ? +limit : 25;
     sort = sort === 'asc' ? 'asc' : 'desc';
 
-    return await this.orderService.getPaginatedOrders(page, limit, sort);
+    return await this.orderService.getPaginatedOrders(
+      page,
+      limit,
+      sort,
+      sortBy,
+    );
   }
 }
