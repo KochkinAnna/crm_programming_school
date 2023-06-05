@@ -6,6 +6,7 @@ import { User } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { adminCredential } from '../common/credential/admin-credential';
 import { ITokenPayload } from '../common/interface/tokenPayload.interface';
+import { RefreshTokenDto } from "./dto/refresh.dto";
 
 @Injectable()
 export class AuthService {
@@ -71,11 +72,11 @@ export class AuthService {
     };
   }
 
-  async refreshToken(refreshToken: string) {
+  async refreshToken(refreshToken: RefreshTokenDto) {
     try {
       console.log('Received refresh token:', refreshToken);
 
-      const decoded = this.jwtService.verify(refreshToken, {
+      const decoded = this.jwtService.verify(refreshToken.refreshToken, {
         secret: jwtConstants.secret,
       });
 

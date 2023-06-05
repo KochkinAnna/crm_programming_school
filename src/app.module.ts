@@ -17,15 +17,19 @@ import { GroupModule } from './group/group.module';
 import { PasswordService } from './password/password.service';
 import { PasswordModule } from './password/password.module';
 import { JwtService } from '@nestjs/jwt';
+import { CommentController } from './comment/comment.controller';
+import { CommentService } from './comment/comment.service';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
-  imports: [AuthModule, OrderModule, UserModule, GroupModule, PasswordModule],
+  imports: [AuthModule, OrderModule, UserModule, GroupModule, PasswordModule, CommentModule],
   controllers: [
     AppController,
     AuthController,
     OrderController,
     UserController,
     GroupController,
+    CommentController,
   ],
   providers: [
     AppService,
@@ -35,6 +39,7 @@ import { JwtService } from '@nestjs/jwt';
     GroupService,
     PasswordService,
     JwtService,
+    CommentService,
   ],
 })
 export class AppModule {}

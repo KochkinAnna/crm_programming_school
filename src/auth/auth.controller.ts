@@ -9,6 +9,7 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { LocalAuthGuard } from './strategy/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -32,9 +33,11 @@ export class AuthController {
   @ApiBody({ description: 'Refresh token' })
   @ApiResponse({ status: 200, description: 'Successful token refresh' })
   @Post('/refresh-token')
-  async refreshTokens(@Body('refreshToken') refreshToken: string) {
+  async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
+    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     try {
-      return await this.authService.refreshToken(refreshToken);
+      console.log(refreshTokenDto, '11111111');
+      return await this.authService.refreshToken(refreshTokenDto);
     } catch (error) {
       throw new BadRequestException('Invalid refresh token');
     }
