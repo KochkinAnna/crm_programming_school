@@ -66,8 +66,9 @@ export class CommentController {
     // type: [Comment],
   })
   async getCommentsByOrderId(
-    @Param('orderId') orderId: number,
+    @Param('orderId') orderId: string,
   ): Promise<Comment[]> {
-    return await this.commentService.getCommentsByOrderId(orderId);
+    const parsedOrderId = parseInt(orderId);
+    return await this.commentService.getCommentsByOrderId(parsedOrderId);
   }
 }
