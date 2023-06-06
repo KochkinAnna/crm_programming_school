@@ -8,7 +8,7 @@ import { Order } from '@prisma/client';
 export class OrderService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  @UseGuards(AuthGuard('jwt'))
+  // @UseGuards(AuthGuard('jwt'))
   async getPaginatedOrders(
     page = 1,
     limit = 25,

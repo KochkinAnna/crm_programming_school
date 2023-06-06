@@ -18,11 +18,6 @@ export class CommentService {
     user: User,
   ) {
     console.log(user);
-    if (user.role !== Role.ADMIN && user.role !== Role.MANAGER) {
-      throw new ForbiddenException(
-        'User does not have permission to create a comment',
-      );
-    }
 
     const order = await this.prismaService.order.findUnique({
       where: { id: orderId },
