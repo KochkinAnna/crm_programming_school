@@ -22,7 +22,14 @@ import { CommentService } from './comment/comment.service';
 import { CommentModule } from './comment/comment.module';
 
 @Module({
-  imports: [AuthModule, OrderModule, UserModule, GroupModule, PasswordModule, CommentModule],
+  imports: [
+    AuthModule,
+    OrderModule,
+    UserModule,
+    GroupModule,
+    PasswordModule,
+    CommentModule,
+  ],
   controllers: [
     AppController,
     AuthController,

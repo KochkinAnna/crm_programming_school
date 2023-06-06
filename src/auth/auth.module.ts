@@ -9,6 +9,7 @@ import { LocalStrategy } from './strategy/local.strategy';
 import { jwtConstants } from './strategy/constants';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
+import { JwtAuthGuard } from './strategy/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -21,7 +22,13 @@ import { JwtStrategy } from './strategy/jwt.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, LocalStrategy, JwtStrategy],
-  exports: [AuthService],
+  providers: [
+    AuthService,
+    PrismaService,
+    LocalStrategy,
+    JwtStrategy,
+    JwtAuthGuard,
+  ],
+  exports: [AuthService, JwtStrategy, JwtAuthGuard],
 })
 export class AuthModule {}

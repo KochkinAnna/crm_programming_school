@@ -6,7 +6,7 @@ import { User } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { adminCredential } from '../common/credential/admin-credential';
 import { ITokenPayload } from '../common/interface/tokenPayload.interface';
-import { RefreshTokenDto } from "./dto/refresh.dto";
+import { RefreshTokenDto } from './dto/refresh.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +18,7 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<User | null> {
     if (email === adminCredential.email && pass === adminCredential.password) {
       const adminUser: Partial<User> = {
+        id: 1, // Встановлення значення id для адміністратора
         email: adminCredential.email,
         password: adminCredential.password,
       };
@@ -45,7 +46,6 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
     const user = await this.validateUser(email, password);
-
     const accessTokenPayload: ITokenPayload = {
       username: user.email,
       sub: user.id,
@@ -74,13 +74,9 @@ export class AuthService {
 
   async refreshToken(refreshToken: RefreshTokenDto) {
     try {
-      console.log('Received refresh token:', refreshToken);
-
       const decoded = this.jwtService.verify(refreshToken.refreshToken, {
         secret: jwtConstants.secret,
       });
-
-      console.log('Decoded token:', decoded);
 
       if (!decoded?.refreshToken) {
         throw new BadRequestException('Invalid refresh token');
@@ -104,7 +100,6 @@ export class AuthService {
         access_token: newAccessToken,
       };
     } catch (error) {
-      console.log('Error:', error);
       throw new BadRequestException('Invalid refresh token');
     }
   }

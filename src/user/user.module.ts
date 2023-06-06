@@ -8,17 +8,21 @@ import { PasswordService } from '../password/password.service';
 import { AuthModule } from '../auth/auth.module';
 import { AuthService } from '../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
+import { CommentModule } from '../comment/comment.module';
+import { CommentService } from '../comment/comment.service';
 
 @Module({
   imports: [
     PrismaModule,
     forwardRef(() => AuthModule),
     forwardRef(() => PasswordModule),
+    forwardRef(() => CommentModule),
   ],
   controllers: [UserController],
   providers: [
     UserService,
     AuthService,
+    CommentService,
     PrismaService,
     PasswordService,
     JwtService,

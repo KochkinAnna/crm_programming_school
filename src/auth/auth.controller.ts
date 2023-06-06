@@ -34,9 +34,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Successful token refresh' })
   @Post('/refresh-token')
   async refreshTokens(@Body() refreshTokenDto: RefreshTokenDto) {
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
     try {
-      console.log(refreshTokenDto, '11111111');
       return await this.authService.refreshToken(refreshTokenDto);
     } catch (error) {
       throw new BadRequestException('Invalid refresh token');
