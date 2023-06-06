@@ -46,12 +46,9 @@ export class CommentController {
     }
 
     const user: User = req.user;
-    console.log(user);
     if (!user) {
       throw new UnauthorizedException('Invalid user');
     }
-
-    console.log(user);
 
     return await this.commentService.createComment(
       createCommentDto,

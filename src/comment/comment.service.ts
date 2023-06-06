@@ -1,10 +1,6 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
-import { Comment, Role, User } from '@prisma/client';
+import { Comment, User } from '@prisma/client';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { EStatus } from '../common/enum/status.enum';
 
@@ -17,13 +13,10 @@ export class CommentService {
     orderId: number,
     user: User,
   ) {
-    console.log(user);
-
     const order = await this.prismaService.order.findUnique({
       where: { id: orderId },
       include: { manager: true },
     });
-    console.log(order);
     if (order?.manager) {
       throw new BadRequestException(
         'Cannot add comment to an order with an assigned manager',
@@ -34,8 +27,7 @@ export class CommentService {
       text: createCommentDto.text,
       author: createCommentDto.author,
     };
-    console.log(user.id);
-    if (!user || !user.id) {
+    if (!user) {
       throw new BadRequestException('Invalid user object or missing user ID');
     }
 
