@@ -1,4 +1,12 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
@@ -11,6 +19,7 @@ import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.respon
 import { SortBy } from '../common/type/sortBy.type';
 import { ESortBy } from '../common/enum/sortBy.enum';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
+import { Order } from '@prisma/client';
 
 @Controller('order')
 @ApiTags('Order')
@@ -58,5 +67,24 @@ export class OrderController {
       sortBy,
       filter,
     );
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get order by ID' })
+  @ApiQuery({ name: 'id', type: Number, example: 1 })
+  @UseGuards(JwtAuthGuard)
+  async getOrderById(@Param('id') id: string): Promise<Order | null> {
+    return await this.orderService.getOrderById(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update order' })
+  @ApiQuery({ name: 'id', type: Number, example: 1 })
+  @UseGuards(JwtAuthGuard)
+  async updateOrder(
+    @Param('id') id: string,
+    @Body() data: Partial<Order>,
+  ): Promise<Order | null> {
+    return await this.orderService.updateOrder(id, data);
   }
 }

@@ -38,4 +38,19 @@ export class OrderService {
       data,
     };
   }
+
+  async getOrderById(id: string): Promise<Order | null> {
+    return this.prismaService.order.findUnique({
+      where: { id: parseInt(id, 10) },
+      include: { group: true },
+    });
+  }
+
+  async updateOrder(id: string, data: Partial<Order>): Promise<Order | null> {
+    return this.prismaService.order.update({
+      where: { id: parseInt(id, 10) },
+      data,
+      include: { group: true },
+    });
+  }
 }
