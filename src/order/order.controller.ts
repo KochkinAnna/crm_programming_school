@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from "@nestjs/common";
 import {
   ApiOkResponse,
   ApiOperation,
@@ -10,6 +10,7 @@ import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface'
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
 import { SortBy } from '../common/type/sortBy.type';
 import { ESortBy } from '../common/enum/sortBy.enum';
+import { JwtAuthGuard } from "../auth/strategy/jwt-auth.guard";
 
 @Controller('order')
 @ApiTags('Order')
@@ -29,6 +30,7 @@ export class OrderController {
   @ApiOkResponse({
     schema: paginatedOrdersResponse,
   })
+  @UseGuards(JwtAuthGuard)
   async getPaginatedOrders(
     @Query('page') page: number,
     @Query('limit') limit: number,
