@@ -14,7 +14,6 @@ export class GroupController {
   @ApiOperation({ summary: 'Create a new group' })
   @UseGuards(JwtAuthGuard)
   async createGroup(@Body() createGroupDto: CreateGroupDto): Promise<Group> {
-    const { name } = createGroupDto;
-    return await this.groupService.createGroup(name);
+    return await this.groupService.createGroup(createGroupDto);
   }
 }
