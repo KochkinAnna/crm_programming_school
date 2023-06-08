@@ -12,7 +12,7 @@ import { ECourseType } from '../../common/enum/course-type.enum';
 import { ECourse } from '../../common/enum/course.enum';
 import { EStatus } from '../../common/enum/status.enum';
 
-export class CreateOrderDto {
+export class UpdateOrderDto {
   @ApiPropertyOptional({
     name: 'name',
     required: false,
