@@ -26,8 +26,8 @@ model Order {
   created_at    DateTime?
   utm           String?
   msg           String?
-  manager       User?     @relation("ManagerToOrder", fields: [userId], references: [id])
-  userId        Int?
+  manager       User?     @relation("ManagerToOrder", fields: [managerId], references: [id])
+  managerId     Int?
   Comment       Comment[]
 
   @@map("orders")

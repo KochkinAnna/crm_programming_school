@@ -27,6 +27,7 @@ export class OrderService {
         skip,
         orderBy,
         where: filter ? FilterUtil.generateWhereFilter(filter) : undefined,
+        include: { manager: true },
       }),
       this.prismaService.order.count(),
     ]);
