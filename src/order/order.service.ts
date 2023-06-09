@@ -20,7 +20,7 @@ export class OrderService {
     const orderBy = {
       [sortBy]: sort === 'asc' ? 'asc' : 'desc',
     };
-    console.log('Before findMany:', filter);
+
     const [data, total] = await Promise.all([
       this.prismaService.order.findMany({
         take: limit,
@@ -32,9 +32,6 @@ export class OrderService {
       this.prismaService.order.count(),
     ]);
 
-    console.log('getPaginatedOrders:', data);
-    console.log('Total orders:', total);
-
     return {
       page,
       limit,
@@ -44,7 +41,6 @@ export class OrderService {
   }
 
   async getOrderById(id: string): Promise<Order | null> {
-    console.log('getOrderById - ID:', id);
     return this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
       include: { group: true, manager: true },
@@ -52,12 +48,11 @@ export class OrderService {
   }
 
   async updateOrder(id: string, data: Partial<Order>): Promise<Order | null> {
-    console.log('updateOrder - ID:', id);
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
       include: { group: true, manager: true },
     });
-    console.log('Order:', order);
+
     if (order && !order.manager) {
       console.log('Updating order:', id);
       return this.prismaService.order.update({
