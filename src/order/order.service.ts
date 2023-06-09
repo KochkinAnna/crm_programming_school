@@ -54,7 +54,6 @@ export class OrderService {
     });
 
     if (order && !order.manager) {
-
       return this.prismaService.order.update({
         where: { id: parseInt(id, 10) },
         data,
@@ -63,5 +62,12 @@ export class OrderService {
     } else {
       throw new Error('Cannot update order with an assigned manager.');
     }
+  }
+
+  async getUserOrders(userId: string): Promise<Order[]> {
+    return this.prismaService.order.findMany({
+      where: { managerId: parseInt(userId, 10) },
+      include: { manager: true },
+    });
   }
 }

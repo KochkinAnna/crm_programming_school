@@ -71,4 +71,12 @@ export class OrderController {
   ): Promise<Order | null> {
     return await this.orderService.updateOrder(id, data);
   }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get user orders' })
+  @ApiQuery({ name: 'userId', type: Number, example: 1 })
+  @UseGuards(JwtAuthGuard)
+  async getUserOrders(@Param('userId') userId: string): Promise<Order[]> {
+    return await this.orderService.getUserOrders(userId);
+  }
 }
