@@ -11,8 +11,9 @@ export class CommentService {
   async createComment(
     createCommentDto: CreateCommentDto,
     orderId: number,
-    user: User,
+    user,
   ) {
+    console.log(user);
     const order = await this.prismaService.order.findUnique({
       where: { id: orderId },
       include: { manager: true },
@@ -32,8 +33,8 @@ export class CommentService {
     }
 
     const orderData = {
-      managerId: user.id,
-      status: EStatus.IN_WORK,
+      managerId: user.userId,
+      status: order?.status ?? EStatus.IN_WORK,
     };
 
     const comment = await this.prismaService.comment.create({
