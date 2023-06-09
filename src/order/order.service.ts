@@ -54,7 +54,7 @@ export class OrderService {
     });
 
     if (order && !order.manager) {
-      console.log('Updating order:', id);
+
       return this.prismaService.order.update({
         where: { id: parseInt(id, 10) },
         data,
