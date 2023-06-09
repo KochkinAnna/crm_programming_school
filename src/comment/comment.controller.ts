@@ -28,6 +28,7 @@ export class CommentController {
 
   @Post(':orderId')
   @ApiParam({ name: 'orderId', description: 'ID of the order' })
+  @ApiOperation({ summary: 'Post comment by logined user' })
   @ApiBody({ type: CreateCommentDto })
   @ApiResponse({
     status: 201,
