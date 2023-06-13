@@ -3,6 +3,7 @@ import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { Order } from '@prisma/client';
 import { FilterUtil } from '../common/utils/filter.util';
+import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 
 @Injectable()
 export class OrderService {
@@ -39,16 +40,8 @@ export class OrderService {
         orderBy,
         where,
         include: {
-          manager: {
-            select: {
-              id: true,
-              email: true,
-              role: true,
-              firstName: true,
-              lastName: true,
-              phone: true,
-            },
-          },
+          group: true,
+          manager: orderIncludes.manager,
         },
       }),
       this.prismaService.order.count({ where }),
@@ -67,16 +60,7 @@ export class OrderService {
       where: { id: parseInt(id, 10) },
       include: {
         group: true,
-        manager: {
-          select: {
-            id: true,
-            email: true,
-            role: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
-          },
-        },
+        manager: orderIncludes.manager,
       },
     });
   }
@@ -88,16 +72,7 @@ export class OrderService {
       where: { id: parseInt(id, 10) },
       include: {
         group: true,
-        manager: {
-          select: {
-            id: true,
-            email: true,
-            role: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
-          },
-        },
+        manager: orderIncludes.manager,
       },
     });
 
@@ -116,16 +91,7 @@ export class OrderService {
           data: { group: { disconnect: true } },
           include: {
             group: true,
-            manager: {
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                firstName: true,
-                lastName: true,
-                phone: true,
-              },
-            },
+            manager: orderIncludes.manager,
           },
         });
       }
@@ -143,16 +109,7 @@ export class OrderService {
         data: { group: { connect: { id: groupId } } },
         include: {
           group: true,
-          manager: {
-            select: {
-              id: true,
-              email: true,
-              role: true,
-              firstName: true,
-              lastName: true,
-              phone: true,
-            },
-          },
+          manager: orderIncludes.manager,
         },
       });
     }
@@ -164,16 +121,7 @@ export class OrderService {
           data: { manager: { disconnect: true } },
           include: {
             group: true,
-            manager: {
-              select: {
-                id: true,
-                email: true,
-                role: true,
-                firstName: true,
-                lastName: true,
-                phone: true,
-              },
-            },
+            manager: orderIncludes.manager,
           },
         });
       }
@@ -199,16 +147,7 @@ export class OrderService {
         data: { manager: { connect: { id: managerId } } },
         include: {
           group: true,
-          manager: {
-            select: {
-              id: true,
-              email: true,
-              role: true,
-              firstName: true,
-              lastName: true,
-              phone: true,
-            },
-          },
+          manager: orderIncludes.manager,
         },
       });
     }
@@ -220,16 +159,8 @@ export class OrderService {
     return this.prismaService.order.findMany({
       where: { managerId: parseInt(userId, 10) },
       include: {
-        manager: {
-          select: {
-            id: true,
-            email: true,
-            role: true,
-            firstName: true,
-            lastName: true,
-            phone: true,
-          },
-        },
+        group: true,
+        manager: orderIncludes.manager,
       },
     });
   }
