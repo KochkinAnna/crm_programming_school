@@ -14,6 +14,8 @@ export class OrderService {
     sort: 'asc' | 'desc' = 'desc',
     sortField: keyof Order = 'id',
     filter?: string,
+    startDate?: string,
+    endDate?: string,
   ): Promise<IPaginatedOrders> {
     const skip = (page - 1) * limit;
 
@@ -21,15 +23,24 @@ export class OrderService {
       [sortField]: sort,
     };
 
+    const where = filter ? FilterUtil.generateWhereFilter(filter) : {};
+
+    if (startDate && endDate) {
+      where.created_at = {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
+    }
+
     const [data, total] = await Promise.all([
       this.prismaService.order.findMany({
         take: limit,
         skip,
         orderBy,
-        where: filter ? FilterUtil.generateWhereFilter(filter) : undefined,
+        where,
         include: { manager: true },
       }),
-      this.prismaService.order.count(),
+      this.prismaService.order.count({ where }),
     ]);
 
     return {

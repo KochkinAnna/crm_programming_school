@@ -29,5 +29,18 @@ export function PaginationQuery(): MethodDecorator {
     Operators: eq (equals), neq (not equals), gt (greater than),
     lt (less than), gte (greater than or equal to), lte (less than or equal to)"`,
     })(target, key, descriptor);
+    ApiQuery({
+      name: 'startDate',
+      type: String,
+      example: '2022-01-01',
+      required: false,
+    })(target, key, descriptor);
+
+    ApiQuery({
+      name: 'endDate',
+      type: String,
+      example: '2022-05-31',
+      required: false,
+    })(target, key, descriptor);
   };
 }

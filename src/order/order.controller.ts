@@ -35,6 +35,18 @@ export class OrderController {
     example: 'course:QACX',
     required: false,
   })
+  @ApiQuery({
+    name: 'startDate',
+    type: String,
+    example: '2023-01-01',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'endDate',
+    type: String,
+    example: '2023-05-31',
+    required: false,
+  })
   @ApiOkResponse({
     schema: paginatedOrdersResponse,
   })
@@ -44,6 +56,8 @@ export class OrderController {
     @Query('limit') limit: number,
     @Query('sort') sort: any,
     @Query('filter') filter: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
   ): Promise<IPaginatedOrders> {
     page = page ? +page : 1;
     limit = limit ? +limit : 25;
@@ -57,6 +71,8 @@ export class OrderController {
       sortOrder,
       sortField,
       filter,
+      startDate,
+      endDate,
     );
   }
 
