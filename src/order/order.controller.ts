@@ -16,12 +16,11 @@ import {
 import { OrderService } from './order.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
-import { SortBy } from '../common/type/sortBy.type';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
 import { Order } from '@prisma/client';
 import { PaginationQuery } from '../common/swagger-helper/paginationQuery.apidecorator';
 
-@Controller('order')
+@Controller('orders')
 @ApiTags('Order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
@@ -29,6 +28,13 @@ export class OrderController {
   @Get()
   @ApiOperation({ summary: 'Get paginated orders' })
   @PaginationQuery()
+  @ApiQuery({ name: 'sort', type: String, example: 'name', required: false })
+  @ApiQuery({
+    name: 'filter',
+    type: String,
+    example: 'course:QACX',
+    required: false,
+  })
   @ApiOkResponse({
     schema: paginatedOrdersResponse,
   })
@@ -36,19 +42,20 @@ export class OrderController {
   async getPaginatedOrders(
     @Query('page') page: number,
     @Query('limit') limit: number,
-    @Query('sort') sort: 'asc' | 'desc',
-    @Query('sortBy') sortBy: SortBy,
+    @Query('sort') sort: any,
     @Query('filter') filter: string,
   ): Promise<IPaginatedOrders> {
     page = page ? +page : 1;
     limit = limit ? +limit : 25;
-    sort = sort === 'asc' ? 'asc' : 'desc';
+
+    const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
+    const sortOrder = sort.startsWith('-') ? 'desc' : 'asc';
 
     return await this.orderService.getPaginatedOrders(
       page,
       limit,
-      sort,
-      sortBy,
+      sortOrder,
+      sortField,
       filter,
     );
   }

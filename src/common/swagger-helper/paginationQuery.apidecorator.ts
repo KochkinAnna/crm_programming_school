@@ -1,5 +1,4 @@
 import { ApiQuery } from '@nestjs/swagger';
-import { ESortBy } from '../enum/sortBy.enum';
 
 export function PaginationQuery(): MethodDecorator {
   return (
@@ -17,15 +16,9 @@ export function PaginationQuery(): MethodDecorator {
       key,
       descriptor,
     );
-    ApiQuery({ name: 'sort', enum: ['asc', 'desc'], example: 'desc' })(
-      target,
-      key,
-      descriptor,
-    );
     ApiQuery({
-      name: 'sortBy',
-      enum: Object.values(ESortBy),
-      example: ESortBy.Id,
+      name: 'sort',
+      example: 'name - this is asc, -name - this is desc',
     })(target, key, descriptor);
     ApiQuery({
       name: 'filter',

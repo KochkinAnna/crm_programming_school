@@ -12,13 +12,13 @@ export class OrderService {
     page = 1,
     limit = 25,
     sort: 'asc' | 'desc' = 'desc',
-    sortBy: keyof Order = 'id',
+    sortField: keyof Order = 'id',
     filter?: string,
   ): Promise<IPaginatedOrders> {
     const skip = (page - 1) * limit;
 
     const orderBy = {
-      [sortBy]: sort === 'asc' ? 'asc' : 'desc',
+      [sortField]: sort,
     };
 
     const [data, total] = await Promise.all([
