@@ -9,12 +9,4 @@ export class CreateCommentDto {
   @IsNotEmpty()
   @IsString()
   text: string;
-
-  @ApiProperty({
-    description: 'Author of the comment',
-    example: 'Managerovych',
-  })
-  @IsNotEmpty()
-  @IsString()
-  author: string;
 }

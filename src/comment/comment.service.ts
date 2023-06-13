@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
-import { Comment, User } from '@prisma/client';
+import { Comment } from '@prisma/client';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { EStatus } from '../common/enum/status.enum';
 
@@ -13,7 +13,6 @@ export class CommentService {
     orderId: number,
     user,
   ) {
-    console.log(user);
     const order = await this.prismaService.order.findUnique({
       where: { id: orderId },
       include: { manager: true },
@@ -26,7 +25,6 @@ export class CommentService {
 
     const commentData = {
       text: createCommentDto.text,
-      author: createCommentDto.author,
     };
     if (!user) {
       throw new BadRequestException('Invalid user object or missing user ID');

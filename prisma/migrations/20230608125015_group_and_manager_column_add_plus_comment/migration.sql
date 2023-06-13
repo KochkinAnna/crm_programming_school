@@ -1,6 +1,6 @@
 -- AlterTable
 ALTER TABLE `orders` ADD COLUMN `groupId` INTEGER NULL,
-    ADD COLUMN `userId` INTEGER NULL;
+    ADD COLUMN `managerId` INTEGER NULL;
 
 -- CreateTable
 CREATE TABLE `groups` (
@@ -29,7 +29,6 @@ CREATE TABLE `users` (
 CREATE TABLE `comments` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `text` VARCHAR(191) NOT NULL,
-    `author` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `orderId` INTEGER NOT NULL,
 
@@ -40,7 +39,7 @@ CREATE TABLE `comments` (
 ALTER TABLE `orders` ADD CONSTRAINT `orders_groupId_fkey` FOREIGN KEY (`groupId`) REFERENCES `groups`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `orders` ADD CONSTRAINT `orders_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `orders` ADD CONSTRAINT `orders_managerId_fkey` FOREIGN KEY (`managerId`) REFERENCES `users`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `comments` ADD CONSTRAINT `comments_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `orders`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
