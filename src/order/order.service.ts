@@ -38,7 +38,18 @@ export class OrderService {
         skip,
         orderBy,
         where,
-        include: { manager: true },
+        include: {
+          manager: {
+            select: {
+              id: true,
+              email: true,
+              role: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+        },
       }),
       this.prismaService.order.count({ where }),
     ]);
@@ -54,37 +65,172 @@ export class OrderService {
   async getOrderById(id: string): Promise<Order | null> {
     return this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
-      include: { group: true, manager: true },
+      include: {
+        group: true,
+        manager: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+      },
     });
   }
 
   async updateOrder(id: string, data: Partial<Order>): Promise<Order | null> {
-    const groupId = data.groupId;
+    const { groupId, managerId } = data;
 
-    if (groupId) {
-      const order = await this.prismaService.order.findUnique({
-        where: { id: parseInt(id, 10) },
-        include: { group: true, manager: true },
-      });
+    const order = await this.prismaService.order.findUnique({
+      where: { id: parseInt(id, 10) },
+      include: {
+        group: true,
+        manager: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+      },
+    });
 
-      if (order && !order.manager) {
+    if (!order) {
+      throw new Error('Order not found');
+    }
+
+    if (order.managerId) {
+      throw new Error('Cannot update order with an assigned manager.');
+    }
+
+    if (groupId !== undefined) {
+      if (groupId === null) {
         return this.prismaService.order.update({
           where: { id: parseInt(id, 10) },
-          data,
-          include: { group: true, manager: true },
+          data: { group: { disconnect: true } },
+          include: {
+            group: true,
+            manager: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+                firstName: true,
+                lastName: true,
+                phone: true,
+              },
+            },
+          },
         });
-      } else {
-        throw new Error('Cannot update order with an assigned manager.');
       }
-    } else {
-      throw new Error('Invalid groupId');
+
+      const group = await this.prismaService.group.findUnique({
+        where: { id: groupId },
+      });
+
+      if (!group) {
+        throw new Error('Invalid groupId');
+      }
+
+      return this.prismaService.order.update({
+        where: { id: parseInt(id, 10) },
+        data: { group: { connect: { id: groupId } } },
+        include: {
+          group: true,
+          manager: {
+            select: {
+              id: true,
+              email: true,
+              role: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+        },
+      });
     }
+
+    if (managerId !== undefined) {
+      if (managerId === null) {
+        return this.prismaService.order.update({
+          where: { id: parseInt(id, 10) },
+          data: { manager: { disconnect: true } },
+          include: {
+            group: true,
+            manager: {
+              select: {
+                id: true,
+                email: true,
+                role: true,
+                firstName: true,
+                lastName: true,
+                phone: true,
+              },
+            },
+          },
+        });
+      }
+
+      const manager = await this.prismaService.user.findUnique({
+        where: { id: managerId },
+        select: {
+          id: true,
+          email: true,
+          role: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+        },
+      });
+
+      if (!manager) {
+        throw new Error('Invalid managerId');
+      }
+
+      return this.prismaService.order.update({
+        where: { id: parseInt(id, 10) },
+        data: { manager: { connect: { id: managerId } } },
+        include: {
+          group: true,
+          manager: {
+            select: {
+              id: true,
+              email: true,
+              role: true,
+              firstName: true,
+              lastName: true,
+              phone: true,
+            },
+          },
+        },
+      });
+    }
+
+    throw new Error('Invalid update data');
   }
 
   async getUserOrders(userId: string): Promise<Order[]> {
     return this.prismaService.order.findMany({
       where: { managerId: parseInt(userId, 10) },
-      include: { manager: true },
+      include: {
+        manager: {
+          select: {
+            id: true,
+            email: true,
+            role: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+          },
+        },
+      },
     });
   }
 }

@@ -103,7 +103,7 @@ export class OrderController {
         throw new NotFoundException('Order not found');
       }
     } catch (error) {
-      throw new BadRequestException('Invalid groupId');
+      throw new BadRequestException(error.message);
     }
   }
 
