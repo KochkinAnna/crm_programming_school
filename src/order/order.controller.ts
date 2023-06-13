@@ -1,7 +1,10 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  InternalServerErrorException,
+  NotFoundException,
   Param,
   Patch,
   Query,
@@ -17,7 +20,7 @@ import { OrderService } from './order.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
-import { Order } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 import { PaginationQuery } from '../common/swagger-helper/paginationQuery.apidecorator';
 
 @Controller('orders')
@@ -92,7 +95,16 @@ export class OrderController {
     @Param('id') id: string,
     @Body() data: Partial<Order>,
   ): Promise<Order | null> {
-    return await this.orderService.updateOrder(id, data);
+    try {
+      const updatedOrder = await this.orderService.updateOrder(id, data);
+      if (updatedOrder) {
+        return updatedOrder;
+      } else {
+        throw new NotFoundException('Order not found');
+      }
+    } catch (error) {
+      throw new BadRequestException('Invalid groupId');
+    }
   }
 
   @Get('user/:userId')

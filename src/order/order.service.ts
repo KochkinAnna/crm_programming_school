@@ -59,19 +59,25 @@ export class OrderService {
   }
 
   async updateOrder(id: string, data: Partial<Order>): Promise<Order | null> {
-    const order = await this.prismaService.order.findUnique({
-      where: { id: parseInt(id, 10) },
-      include: { group: true, manager: true },
-    });
+    const groupId = data.groupId;
 
-    if (order && !order.manager) {
-      return this.prismaService.order.update({
+    if (groupId) {
+      const order = await this.prismaService.order.findUnique({
         where: { id: parseInt(id, 10) },
-        data,
         include: { group: true, manager: true },
       });
+
+      if (order && !order.manager) {
+        return this.prismaService.order.update({
+          where: { id: parseInt(id, 10) },
+          data,
+          include: { group: true, manager: true },
+        });
+      } else {
+        throw new Error('Cannot update order with an assigned manager.');
+      }
     } else {
-      throw new Error('Cannot update order with an assigned manager.');
+      throw new Error('Invalid groupId');
     }
   }
 
