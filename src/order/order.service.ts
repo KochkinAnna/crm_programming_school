@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
-import { Order, Prisma } from '@prisma/client';
+import { Order, Prisma, User } from '@prisma/client';
 import { FilterUtil } from '../common/utils/filter.util';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 
@@ -75,50 +79,43 @@ export class OrderService {
     });
   }
 
-  async updateOrder(id: string, data: Partial<Order>): Promise<Order | null> {
-    const { groupId, managerId, ...updateData } = data;
+  async updateOrder(id: string, data, user): Promise<Order | null> {
+    console.log(user, 'From service');
 
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
-      include: {
-        group: true,
-        manager: true,
-      },
+      include: { group: true, manager: true },
     });
 
     if (!order) {
-      throw new Error('Order not found');
+      throw new NotFoundException('Order not found');
     }
 
-    if (order.managerId) {
-      throw new Error('Cannot update order with an assigned manager.');
+    if (user.role === 'MANAGER' && order.managerId !== user.userId) {
+      throw new UnauthorizedException(
+        "You are not allowed to update this order. It's order of another manager.",
+      );
     }
 
-    const updateParams: Prisma.OrderUpdateInput = {
-      ...updateData,
-      ...(groupId !== undefined && groupId !== null
-        ? { group: { connect: { id: groupId } } }
-        : {}),
-      ...(managerId !== undefined && managerId !== null
-        ? { manager: { connect: { id: managerId } } }
-        : {}),
-    };
-
-    if (groupId === null) {
-      delete updateParams.group;
-    }
-
-    if (managerId === null) {
-      delete updateParams.manager;
-    }
-
+    const updateParams = this.buildUpdateParams(data);
     return this.prismaService.order.update({
       where: { id: parseInt(id, 10) },
       data: updateParams,
-      include: {
-        group: true,
-        manager: orderIncludes.manager,
-      },
+      include: { group: true, manager: true },
     });
+  }
+
+  private buildUpdateParams(data) {
+    const { groupId, ...updateData } = data;
+
+    const updateParams: Prisma.OrderUpdateInput = {
+      ...updateData,
+      group:
+        groupId !== undefined && groupId !== null
+          ? { connect: { id: groupId } }
+          : undefined,
+    };
+
+    return updateParams;
   }
 }

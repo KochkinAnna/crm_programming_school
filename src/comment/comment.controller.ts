@@ -47,6 +47,7 @@ export class CommentController {
     }
 
     const user: User = req.user;
+
     if (!user) {
       throw new UnauthorizedException('Invalid user');
     }

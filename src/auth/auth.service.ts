@@ -21,6 +21,7 @@ export class AuthService {
         id: 1, // Встановлення значення id для адміністратора
         email: adminCredential.email,
         password: adminCredential.password,
+        role: 'ADMIN',
       };
 
       return adminUser as User;
@@ -49,10 +50,13 @@ export class AuthService {
     const accessTokenPayload: ITokenPayload = {
       username: user.email,
       sub: user.id,
+      role: user.role,
     };
+    console.log(accessTokenPayload);
     const refreshTokenPayload: ITokenPayload = {
       username: user.email,
       sub: user.id,
+      role: user.role,
       refreshToken: true,
     };
 
@@ -90,6 +94,7 @@ export class AuthService {
       const accessTokenPayload: ITokenPayload = {
         username: user.email,
         sub: user.id,
+        role: user.role,
       };
       const newAccessToken = this.jwtService.sign(accessTokenPayload, {
         secret: jwtConstants.secret,

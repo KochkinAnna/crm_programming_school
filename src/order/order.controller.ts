@@ -8,6 +8,8 @@ import {
   Param,
   Patch,
   Query,
+  Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,7 +22,7 @@ import { OrderService } from './order.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
-import { Order, Prisma } from '@prisma/client';
+import { Order, Prisma, User } from '@prisma/client';
 import { PaginationQuery } from '../common/swagger-helper/paginationQuery.apidecorator';
 
 @Controller('orders')
@@ -94,9 +96,15 @@ export class OrderController {
   async updateOrder(
     @Param('id') id: string,
     @Body() data: Partial<Order>,
+    @Req() req,
   ): Promise<Order | null> {
     try {
-      const updatedOrder = await this.orderService.updateOrder(id, data);
+      const user: User = req.user;
+
+      if (!user) {
+        throw new UnauthorizedException('Invalid user');
+      }
+      const updatedOrder = await this.orderService.updateOrder(id, data, user);
       if (updatedOrder) {
         return updatedOrder;
       } else {
