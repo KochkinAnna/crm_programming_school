@@ -6,6 +6,8 @@ import {
   Param,
   Delete,
   NotFoundException,
+  ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -21,7 +23,17 @@ export class UserController {
   @ApiOperation({ summary: 'Create a new user' })
   @ApiCreatedResponse({ description: 'The created user', type: CreateUserDto })
   async createUser(@Body() userData: CreateUserDto): Promise<User> {
-    return this.userService.createUser(userData);
+    try {
+      const existingUser = await this.userService.getUserByEmail(
+        userData.email,
+      );
+      if (existingUser) {
+        throw new ConflictException('User with this email already exists');
+      }
+      return this.userService.createUser(userData);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Get()
@@ -31,7 +43,7 @@ export class UserController {
     type: CreateUserDto,
     isArray: true,
   })
-  async getUsers(): Promise<User[]> {
+  async getUsers(): Promise<Partial<User>[]> {
     return this.userService.getUsers();
   }
 

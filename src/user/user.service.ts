@@ -27,8 +27,17 @@ export class UserService {
     });
   }
 
-  async getUsers(): Promise<User[]> {
-    return this.prismaService.user.findMany();
+  async getUsers(): Promise<Partial<User>[]> {
+    return this.prismaService.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+      },
+    });
   }
 
   async getUserByEmail(email: string): Promise<User | null> {

@@ -8,6 +8,7 @@ import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface'
 import { Order, Prisma, User } from '@prisma/client';
 import { FilterUtil } from '../common/utils/filter.util';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
+import { EStatus } from '../common/enum/status.enum';
 
 @Injectable()
 export class OrderService {
@@ -82,7 +83,7 @@ export class OrderService {
   async updateOrder(id: string, data, user): Promise<Order | null> {
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
-      include: { group: true, manager: true },
+      include: { group: true, manager: orderIncludes.manager },
     });
 
     if (!order) {
@@ -99,7 +100,7 @@ export class OrderService {
     return this.prismaService.order.update({
       where: { id: parseInt(id, 10) },
       data: updateParams,
-      include: { group: true, manager: true },
+      include: { group: true, manager: orderIncludes.manager },
     });
   }
 
@@ -113,6 +114,10 @@ export class OrderService {
           ? { connect: { id: groupId } }
           : undefined,
     };
+
+    if (updateData.status === EStatus.NEW) {
+      updateParams.manager = { disconnect: true };
+    }
 
     return updateParams;
   }
