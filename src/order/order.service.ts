@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
-import { Order } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 import { FilterUtil } from '../common/utils/filter.util';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 
@@ -65,14 +65,24 @@ export class OrderService {
     });
   }
 
+  async getUserOrders(userId: string): Promise<Order[]> {
+    return this.prismaService.order.findMany({
+      where: { managerId: parseInt(userId, 10) },
+      include: {
+        group: true,
+        manager: orderIncludes.manager,
+      },
+    });
+  }
+
   async updateOrder(id: string, data: Partial<Order>): Promise<Order | null> {
-    const { groupId, managerId } = data;
+    const { groupId, managerId, ...updateData } = data;
 
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
       include: {
         group: true,
-        manager: orderIncludes.manager,
+        manager: true,
       },
     });
 
@@ -84,80 +94,27 @@ export class OrderService {
       throw new Error('Cannot update order with an assigned manager.');
     }
 
-    if (groupId !== undefined) {
-      if (groupId === null) {
-        return this.prismaService.order.update({
-          where: { id: parseInt(id, 10) },
-          data: { group: { disconnect: true } },
-          include: {
-            group: true,
-            manager: orderIncludes.manager,
-          },
-        });
-      }
+    const updateParams: Prisma.OrderUpdateInput = {
+      ...updateData,
+      ...(groupId !== undefined && groupId !== null
+        ? { group: { connect: { id: groupId } } }
+        : {}),
+      ...(managerId !== undefined && managerId !== null
+        ? { manager: { connect: { id: managerId } } }
+        : {}),
+    };
 
-      const group = await this.prismaService.group.findUnique({
-        where: { id: groupId },
-      });
-
-      if (!group) {
-        throw new Error('Invalid groupId');
-      }
-
-      return this.prismaService.order.update({
-        where: { id: parseInt(id, 10) },
-        data: { group: { connect: { id: groupId } } },
-        include: {
-          group: true,
-          manager: orderIncludes.manager,
-        },
-      });
+    if (groupId === null) {
+      delete updateParams.group;
     }
 
-    if (managerId !== undefined) {
-      if (managerId === null) {
-        return this.prismaService.order.update({
-          where: { id: parseInt(id, 10) },
-          data: { manager: { disconnect: true } },
-          include: {
-            group: true,
-            manager: orderIncludes.manager,
-          },
-        });
-      }
-
-      const manager = await this.prismaService.user.findUnique({
-        where: { id: managerId },
-        select: {
-          id: true,
-          email: true,
-          role: true,
-          firstName: true,
-          lastName: true,
-          phone: true,
-        },
-      });
-
-      if (!manager) {
-        throw new Error('Invalid managerId');
-      }
-
-      return this.prismaService.order.update({
-        where: { id: parseInt(id, 10) },
-        data: { manager: { connect: { id: managerId } } },
-        include: {
-          group: true,
-          manager: orderIncludes.manager,
-        },
-      });
+    if (managerId === null) {
+      delete updateParams.manager;
     }
 
-    throw new Error('Invalid update data');
-  }
-
-  async getUserOrders(userId: string): Promise<Order[]> {
-    return this.prismaService.order.findMany({
-      where: { managerId: parseInt(userId, 10) },
+    return this.prismaService.order.update({
+      where: { id: parseInt(id, 10) },
+      data: updateParams,
       include: {
         group: true,
         manager: orderIncludes.manager,
