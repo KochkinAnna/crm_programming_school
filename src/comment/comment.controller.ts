@@ -21,7 +21,7 @@ import { Comment, User } from '@prisma/client';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
 
-@Controller('comment')
+@Controller('comments')
 @ApiTags('Comments')
 export class CommentController {
   constructor(private commentService: CommentService) {}

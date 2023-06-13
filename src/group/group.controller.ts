@@ -5,7 +5,7 @@ import { Group } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
 import { CreateGroupDto } from './dto/createGroup.dto';
 
-@Controller('group')
+@Controller('groups')
 @ApiTags('Group')
 export class GroupController {
   constructor(private readonly groupService: GroupService) {}

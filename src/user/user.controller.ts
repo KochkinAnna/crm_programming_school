@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { User } from '@prisma/client';
 
-@Controller('user')
+@Controller('users')
 @ApiTags('User')
 export class UserController {
   constructor(private readonly userService: UserService) {}
