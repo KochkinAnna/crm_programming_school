@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  NotFoundException,
+} from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -31,6 +39,21 @@ export class UserController {
   @ApiOperation({ summary: 'Get user by email' })
   @ApiCreatedResponse({ description: 'The user', type: CreateUserDto })
   async getUserByEmail(@Param('email') email: string): Promise<User | null> {
-    return this.userService.getUserByEmail(email);
+    const user = await this.userService.getUserByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
+  @Delete('/:email')
+  @ApiOperation({ summary: 'Delete user by email' })
+  @ApiCreatedResponse({ description: 'The deleted user', type: CreateUserDto })
+  async deleteUserByEmail(@Param('email') email: string): Promise<void> {
+    try {
+      await this.userService.deleteUserByEmail(email);
+    } catch (error) {
+      throw new NotFoundException('User not found');
+    }
   }
 }

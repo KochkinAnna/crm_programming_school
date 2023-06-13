@@ -80,8 +80,6 @@ export class OrderService {
   }
 
   async updateOrder(id: string, data, user): Promise<Order | null> {
-    console.log(user, 'From service');
-
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
       include: { group: true, manager: true },
