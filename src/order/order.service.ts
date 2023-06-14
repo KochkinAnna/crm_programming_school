@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
-import { Order, Prisma, User } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 import { FilterUtil } from '../common/utils/filter.util';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 import { EStatus } from '../common/enum/status.enum';

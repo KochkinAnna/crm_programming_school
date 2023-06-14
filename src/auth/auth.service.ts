@@ -101,8 +101,21 @@ export class AuthService {
         expiresIn: jwtConstants.accessTokenExpiresIn,
       });
 
+      const refreshTokenPayload: ITokenPayload = {
+        username: user.email,
+        sub: user.id,
+        role: user.role,
+        refreshToken: true,
+      };
+
+      const newRefreshToken = this.jwtService.sign(refreshTokenPayload, {
+        secret: jwtConstants.secret,
+        expiresIn: jwtConstants.refreshTokenExpiresIn,
+      });
+
       return {
         access_token: newAccessToken,
+        refresh_token: newRefreshToken,
       };
     } catch (error) {
       throw new BadRequestException('Invalid refresh token');
