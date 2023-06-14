@@ -66,7 +66,7 @@ export class OrderController {
   ): Promise<IPaginatedOrders> {
     const normalizedPage = page ? +page : 1;
     const normalizedLimit = limit ? +limit : 25;
-    const normalizedSort = sort || '-id'; // Сортувати за замовчуванням від найбільшого айді до найменшого
+    const normalizedSort = sort || '-id';
 
     const sortOrder: 'asc' | 'desc' = normalizedSort.startsWith('-')
       ? 'desc'
