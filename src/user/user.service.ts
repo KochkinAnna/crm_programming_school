@@ -15,9 +15,12 @@ export class UserService {
     const passwordHash = await this.passwordService.hashPassword(
       userData.password,
     );
+
+    const emailLowerCase = userData.email.toLowerCase();
+
     return this.prismaService.user.create({
       data: {
-        email: userData.email,
+        email: emailLowerCase,
         password: passwordHash,
         role: userData.role,
         firstName: userData.firstName,
@@ -41,10 +44,14 @@ export class UserService {
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    return this.prismaService.user.findUnique({ where: { email } });
+    const lowercaseEmail = email.toLowerCase();
+    return this.prismaService.user.findUnique({
+      where: { email: lowercaseEmail },
+    });
   }
 
   async deleteUserByEmail(email: string): Promise<void> {
-    await this.prismaService.user.delete({ where: { email } });
+    const lowercaseEmail = email.toLowerCase();
+    await this.prismaService.user.delete({ where: { email: lowercaseEmail } });
   }
 }
