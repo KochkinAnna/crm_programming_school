@@ -86,14 +86,6 @@ export class OrderController {
     );
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get order by ID' })
-  @ApiQuery({ name: 'id', type: Number, example: 1 })
-  @UseGuards(JwtAuthGuard)
-  async getOrderById(@Param('id') id: string): Promise<Order | null> {
-    return await this.orderService.getOrderById(id);
-  }
-
   @Patch(':id')
   @ApiOperation({ summary: 'Update order' })
   @ApiQuery({ name: 'id', type: Number, example: 1 })

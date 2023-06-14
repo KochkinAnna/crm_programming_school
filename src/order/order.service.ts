@@ -29,13 +29,20 @@ export class OrderService {
       [sortField]: sort,
     };
 
-    const where = filter ? FilterUtil.generateWhereFilter(filter) : {};
+    const where: Prisma.OrderWhereInput = {};
 
-    if (startDate && endDate) {
-      where.created_at = {
-        gte: new Date(startDate),
-        lte: new Date(endDate),
-      };
+    if (filter) {
+      if (filter.startsWith('id:')) {
+        const orderId = parseInt(filter.substring(3), 10);
+        if (!isNaN(orderId)) {
+          where.id = { equals: orderId };
+        }
+      } else {
+        where.created_at = {
+          gte: startDate ? new Date(startDate) : undefined,
+          lte: endDate ? new Date(endDate) : undefined,
+        };
+      }
     }
 
     const [data, total] = await Promise.all([
@@ -58,16 +65,6 @@ export class OrderService {
       total,
       data,
     };
-  }
-
-  async getOrderById(id: string): Promise<Order | null> {
-    return this.prismaService.order.findUnique({
-      where: { id: parseInt(id, 10) },
-      include: {
-        group: true,
-        manager: orderIncludes.manager,
-      },
-    });
   }
 
   async getUserOrders(userId: string): Promise<Order[]> {
