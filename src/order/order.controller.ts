@@ -57,22 +57,27 @@ export class OrderController {
   })
   @UseGuards(JwtAuthGuard)
   async getPaginatedOrders(
-    @Query('page') page: number,
-    @Query('limit') limit: number,
-    @Query('sort') sort: any,
-    @Query('filter') filter: string,
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('sort') sort?: string,
+    @Query('filter') filter?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
   ): Promise<IPaginatedOrders> {
-    page = page ? +page : 1;
-    limit = limit ? +limit : 25;
+    const normalizedPage = page ? +page : 1;
+    const normalizedLimit = limit ? +limit : 25;
+    const normalizedSort = sort || '-id'; // Сортувати за замовчуванням від найбільшого айді до найменшого
 
-    const sortField = sort.startsWith('-') ? sort.substring(1) : sort;
-    const sortOrder = sort.startsWith('-') ? 'desc' : 'asc';
+    const sortOrder: 'asc' | 'desc' = normalizedSort.startsWith('-')
+      ? 'desc'
+      : 'asc';
+    const sortField: any = normalizedSort.startsWith('-')
+      ? normalizedSort.substring(1)
+      : 'id';
 
     return await this.orderService.getPaginatedOrders(
-      page,
-      limit,
+      normalizedPage,
+      normalizedLimit,
       sortOrder,
       sortField,
       filter,
