@@ -2,14 +2,16 @@ import {
   Controller,
   Post,
   Body,
-  UseGuards,
   BadRequestException,
+  UseGuards,
+  Get,
+  Req,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LocalAuthGuard } from './strategy/local-auth.guard';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh.dto';
+import { JwtAuthGuard } from './strategy/jwt-auth.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -19,7 +21,6 @@ export class AuthController {
   @ApiOperation({ summary: 'Login' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({ status: 200, description: 'Successful login' })
-  // @UseGuards(LocalAuthGuard)
   @Post('/login')
   async login(@Body() loginDto: LoginDto) {
     try {
@@ -39,5 +40,13 @@ export class AuthController {
     } catch (error) {
       throw new BadRequestException('Invalid refresh token');
     }
+  }
+
+  @ApiOperation({ summary: 'Get current user' })
+  @ApiResponse({ status: 200, description: 'Return the current user' })
+  @UseGuards(JwtAuthGuard)
+  @Get('/me')
+  getCurrentUser(@Req() req) {
+    return req.user;
   }
 }
