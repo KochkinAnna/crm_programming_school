@@ -28,10 +28,13 @@ export class FilterUtil {
           case 'lte':
             filterObject[field] = { lte: parseInt(value, 10) };
             break;
+          default:
+            filterObject[field] = { contains: value.toLowerCase() };
+            break;
         }
       } else {
         if (operator === 'like') {
-          filterObject[field] = { contains: `%${value.toLowerCase()}%` };
+          filterObject[field] = { contains: value.toLowerCase() };
         } else {
           filterObject[field] = { [operator]: value };
         }
