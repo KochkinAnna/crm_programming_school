@@ -68,12 +68,21 @@ export class OrderController {
     const normalizedLimit: number = +limit || 25;
     const normalizedSort: string = sort || '-id';
 
-    const sortOrder: 'asc' | 'desc' = normalizedSort.startsWith('-')
-      ? 'desc'
-      : 'asc';
-    const sortField: keyof Order = normalizedSort.startsWith('-')
-      ? (normalizedSort.substring(1) as keyof Order)
-      : 'id';
+    let sortField: keyof Order | undefined;
+    let sortOrder: 'desc' | 'asc' = 'desc';
+
+    if (normalizedSort.startsWith('-')) {
+      const field = normalizedSort.substring(1);
+      sortField = field as keyof Order;
+      sortOrder = 'desc';
+    } else if (normalizedSort.includes(':')) {
+      const [field, direction] = normalizedSort.split(':');
+      sortField = field as keyof Order;
+      sortOrder = direction as 'desc' | 'asc';
+    } else {
+      sortField = normalizedSort as keyof Order;
+      sortOrder = 'asc';
+    }
 
     return await this.orderService.getPaginatedOrders(
       normalizedPage,

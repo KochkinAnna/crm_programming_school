@@ -17,7 +17,7 @@ export class OrderService {
   async getPaginatedOrders(
     page = 1,
     limit = 25,
-    sort: 'asc' | 'desc' = 'desc',
+    sort: 'desc' | 'asc' = 'desc',
     sortField: keyof Order = 'id',
     filter?: string,
     startDate?: string,
@@ -25,9 +25,11 @@ export class OrderService {
   ): Promise<IPaginatedOrders> {
     const skip = (page - 1) * limit;
 
-    const orderBy = {
-      [sortField]: sort,
-    };
+    const orderBy: Prisma.OrderOrderByWithRelationInput = {};
+
+    if (sortField) {
+      orderBy[sortField] = sort;
+    }
 
     const where: Prisma.OrderWhereInput = {};
 
