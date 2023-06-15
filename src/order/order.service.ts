@@ -6,9 +6,9 @@ import {
 import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { Order, Prisma } from '@prisma/client';
-import { FilterUtil } from '../common/utils/filter.util';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 import { EStatus } from '../common/enum/status.enum';
+import { FilterUtil } from '../common/utils/filter.util';
 
 @Injectable()
 export class OrderService {
@@ -32,18 +32,14 @@ export class OrderService {
     const where: Prisma.OrderWhereInput = {};
 
     if (filter) {
-      if (filter.startsWith('id:')) {
-        const orderId = parseInt(filter.substring(3), 10);
-        if (!isNaN(orderId)) {
-          where.id = { equals: orderId };
-        }
-      } else {
-        where.created_at = {
-          gte: startDate ? new Date(startDate) : undefined,
-          lte: endDate ? new Date(endDate) : undefined,
-        };
-      }
+      const filterObject = FilterUtil.generateWhereFilter(filter);
+      Object.assign(where, filterObject);
     }
+
+    where.created_at = {
+      gte: startDate ? new Date(startDate) : undefined,
+      lte: endDate ? new Date(endDate) : undefined,
+    };
 
     const [data, total] = await Promise.all([
       this.prismaService.order.findMany({

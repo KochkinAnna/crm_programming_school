@@ -31,28 +31,17 @@ export class FilterUtil {
         }
       } else {
         if (operator === 'like') {
-          filterObject[field] = { contains: value };
+          filterObject[field] = { contains: `%${value.toLowerCase()}%` };
         } else {
           filterObject[field] = { [operator]: value };
         }
       }
     }
 
-    if (FilterUtil.isTextField(field)) {
-      filterObject[field] = {
-        contains: conditions[0],
-      };
-    }
-
     return filterObject;
   }
 
   static isNumericField(field: string) {
-    return ['age', 'sum', 'alreadyPaid'].includes(field);
-  }
-
-  static isTextField(field: string) {
-    const lowercaseField = field.toLowerCase();
-    return lowercaseField === field.toLowerCase();
+    return ['id', 'age', 'sum', 'alreadyPaid'].includes(field);
   }
 }

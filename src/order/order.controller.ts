@@ -64,15 +64,15 @@ export class OrderController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ): Promise<IPaginatedOrders> {
-    const normalizedPage = page ? +page : 1;
-    const normalizedLimit = limit ? +limit : 25;
-    const normalizedSort = sort || '-id';
+    const normalizedPage: number = +page || 1;
+    const normalizedLimit: number = +limit || 25;
+    const normalizedSort: string = sort || '-id';
 
     const sortOrder: 'asc' | 'desc' = normalizedSort.startsWith('-')
       ? 'desc'
       : 'asc';
-    const sortField: any = normalizedSort.startsWith('-')
-      ? normalizedSort.substring(1)
+    const sortField: keyof Order = normalizedSort.startsWith('-')
+      ? (normalizedSort.substring(1) as keyof Order)
       : 'id';
 
     return await this.orderService.getPaginatedOrders(
