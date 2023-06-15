@@ -17,7 +17,7 @@ export class CommentService {
       where: { id: orderId },
       include: { manager: true },
     });
-    if (order?.manager) {
+    if (order?.manager && order.manager.id !== user.userId) {
       throw new BadRequestException(
         'Cannot add comment to an order with an assigned manager',
       );
