@@ -22,7 +22,7 @@ import { OrderService } from './order.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
-import { Order, Prisma, User } from '@prisma/client';
+import { Order, User } from '@prisma/client';
 import { PaginationQuery } from '../common/swagger-helper/paginationQuery.apidecorator';
 
 @Controller('orders')
@@ -33,25 +33,6 @@ export class OrderController {
   @Get()
   @ApiOperation({ summary: 'Get paginated orders' })
   @PaginationQuery()
-  @ApiQuery({ name: 'sort', type: String, example: 'name', required: false })
-  @ApiQuery({
-    name: 'filter',
-    type: String,
-    example: 'course:QACX',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'startDate',
-    type: String,
-    example: '2023-01-01',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'endDate',
-    type: String,
-    example: '2023-05-31',
-    required: false,
-  })
   @ApiOkResponse({
     schema: paginatedOrdersResponse,
   })
