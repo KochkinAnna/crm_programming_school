@@ -27,7 +27,7 @@ export function PaginationQuery(): MethodDecorator {
       description: `
    *    Filter query in the format "field:value" for string fields (without space!).
    *    For partial string matching, use the format "field:like:value" (example: name:like:ho to receive orders with the order's name, for example Jhon).
-   *    For numeric fields (such as "age", "sum", and "alreadyPaid"), use the format "field:operator:value" (example: age:eq:30 or id:eq:1).<p>Operators: eq (equals), neq (not equals), gt (greater than), lt (less than), gte (greater than or equal to), lte (less than or equal to).</p>`,
+   *    For numeric fields (such as "id", "age", "sum", and "alreadyPaid"), use the format "field:operator:value" (example: age:eq:30 or id:eq:1).<p>Operators: eq (equals), neq (not equals), gt (greater than), lt (less than), gte (greater than or equal to), lte (less than or equal to).</p>`,
     })(target, key, descriptor);
     ApiQuery({
       name: 'startDate',
