@@ -5,7 +5,8 @@ export class FilterUtil {
     const filterObject: any = {};
 
     if (conditions.length === 1) {
-      filterObject[field] = conditions[0];
+      const value = conditions[0].toLowerCase();
+      filterObject[field] = { contains: value };
     } else if (conditions.length === 2) {
       const [operator, value] = conditions;
       if (FilterUtil.isNumericField(field)) {
@@ -29,15 +30,10 @@ export class FilterUtil {
             filterObject[field] = { lte: parseInt(value, 10) };
             break;
           default:
-            filterObject[field] = { contains: value.toLowerCase() };
-            break;
+            throw new Error(`Invalid operator '${operator}' for numeric field`);
         }
       } else {
-        if (operator === 'like') {
-          filterObject[field] = { contains: value.toLowerCase() };
-        } else {
-          filterObject[field] = { [operator]: value };
-        }
+        filterObject[field] = { contains: value };
       }
     }
 
