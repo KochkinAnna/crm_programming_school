@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
 
@@ -17,12 +17,13 @@ export class UserService {
     );
 
     const emailLowerCase = userData.email.toLowerCase();
+    const roleUpperCase = userData.role.toString().toUpperCase();
 
     return this.prismaService.user.create({
       data: {
         email: emailLowerCase,
         password: passwordHash,
-        role: userData.role,
+        role: roleUpperCase as Role,
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,
