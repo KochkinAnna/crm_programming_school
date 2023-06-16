@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
 import { Role, User } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
+import { ERole } from '../common/enum/role.enum';
 
 @Injectable()
 export class UserService {
@@ -18,6 +19,12 @@ export class UserService {
 
     const emailLowerCase = userData.email.toLowerCase();
     const roleUpperCase = userData.role.toString().toUpperCase();
+
+    if (!Object.values(ERole).includes(roleUpperCase)) {
+      throw new BadRequestException(
+        'An invalid role has been entered. Please select a role from the list of available roles: ADMIN or MANAGER',
+      );
+    }
 
     return this.prismaService.user.create({
       data: {

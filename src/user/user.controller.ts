@@ -20,8 +20,6 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
-  @ApiCreatedResponse({ description: 'The created user', type: CreateUserDto })
   async createUser(@Body() userData: CreateUserDto): Promise<User> {
     try {
       const existingUser = await this.userService.getUserByEmail(
@@ -32,7 +30,10 @@ export class UserController {
       }
       return this.userService.createUser(userData);
     } catch (error) {
-      throw new BadRequestException(error.message);
+      if (error instanceof BadRequestException) {
+        throw new BadRequestException(error.message);
+      }
+      throw error;
     }
   }
 
