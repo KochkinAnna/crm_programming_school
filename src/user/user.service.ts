@@ -3,7 +3,7 @@ import { PrismaService } from '../common/orm/prisma.service';
 import { Role, User } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
-import { generateActivationToken } from '../common/utils/token.utils';
+import { generateActivationToken } from '../common/utils/activationToken.utils';
 
 @Injectable()
 export class UserService {
