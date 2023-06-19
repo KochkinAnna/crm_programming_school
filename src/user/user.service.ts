@@ -12,23 +12,28 @@ export class UserService {
     public readonly passwordService: PasswordService,
   ) {}
 
-  async createUser(userData: CreateUserDto): Promise<User> {
+  async createUser(
+    userData: CreateUserDto,
+  ): Promise<{ activationToken: string }> {
     const emailLowerCase = userData.email.toLowerCase();
 
     const activationToken = generateActivationToken();
-    const userToCreate: any = {
+    const userToCreate = {
       email: emailLowerCase,
       firstName: userData.firstName,
       lastName: userData.lastName,
+      role: Role.MANAGER,
       activationToken,
     };
 
-    return await this.prismaService.user.create({
+    await this.prismaService.user.create({
       data: userToCreate,
     });
+
+    return { activationToken };
   }
 
-  async activateUser(activationToken: string, password: string): Promise<void> {
+  async activateUser(activationToken: string, password: string): Promise<any> {
     const user = await this.prismaService.user.findUnique({
       where: { activationToken },
     });
@@ -39,12 +44,20 @@ export class UserService {
 
     const passwordHash = await this.passwordService.hashPassword(password);
 
-    await this.prismaService.user.update({
+    return await this.prismaService.user.update({
       where: { id: user.id },
       data: {
         password: passwordHash,
         activationToken: null,
-        role: Role.MANAGER,
+        isActive: true,
+      },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
         isActive: true,
       },
     });

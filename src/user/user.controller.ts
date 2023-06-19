@@ -26,9 +26,12 @@ export class UserController {
   @Post()
   @ApiOperation({ summary: 'Create a user' })
   @ApiCreatedResponse({ description: 'The created user', type: CreateUserDto })
-  async createUser(@Body() userData: CreateUserDto): Promise<User> {
+  async createUser(
+    @Body() userData: CreateUserDto,
+  ): Promise<{ activationToken: string }> {
     try {
-      return await this.userService.createUser(userData);
+      const createdUser = await this.userService.createUser(userData);
+      return { activationToken: createdUser.activationToken };
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.message);
@@ -43,7 +46,7 @@ export class UserController {
   async activateUser(
     @Param('activationToken') activationToken: string,
     @Body('password') password: string,
-  ): Promise<void> {
+  ): Promise<User> {
     return this.userService.activateUser(activationToken, password);
   }
 
