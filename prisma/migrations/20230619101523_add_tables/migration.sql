@@ -20,6 +20,8 @@ CREATE TABLE `users` (
     `firstName` VARCHAR(191) NULL,
     `lastName` VARCHAR(191) NULL,
     `phone` VARCHAR(191) NULL,
+    `isActive` BOOLEAN NOT NULL DEFAULT false,
+    `lastLogin` DATETIME(3) NULL,
 
     UNIQUE INDEX `users_email_key`(`email`),
     PRIMARY KEY (`id`)

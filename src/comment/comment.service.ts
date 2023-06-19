@@ -3,6 +3,7 @@ import { PrismaService } from '../common/orm/prisma.service';
 import { Comment } from '@prisma/client';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { EStatus } from '../common/enum/status.enum';
+import { ERole } from '../common/enum/role.enum';
 
 @Injectable()
 export class CommentService {
@@ -17,7 +18,11 @@ export class CommentService {
       where: { id: orderId },
       include: { manager: true },
     });
-    if (order?.manager && order.manager.id !== user.userId) {
+    if (
+      order?.manager &&
+      order.manager.id !== user.userId &&
+      user.role !== ERole.ADMIN
+    ) {
       throw new BadRequestException(
         'Cannot add comment to an order with an assigned manager',
       );
