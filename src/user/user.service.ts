@@ -3,7 +3,6 @@ import { PrismaService } from '../common/orm/prisma.service';
 import { Role, User } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
-import { ERole } from '../common/enum/role.enum';
 
 @Injectable()
 export class UserService {
@@ -13,28 +12,66 @@ export class UserService {
   ) {}
 
   async createUser(userData: CreateUserDto): Promise<User> {
-    const passwordHash = await this.passwordService.hashPassword(
-      userData.password,
-    );
-
     const emailLowerCase = userData.email.toLowerCase();
-    const roleUpperCase = userData.role.toString().toUpperCase();
 
-    if (!Object.values(ERole).includes(roleUpperCase)) {
-      throw new BadRequestException(
-        'An invalid role has been entered. Please select a role from the list of available roles: ADMIN or MANAGER',
-      );
+    const activationToken = this.generateActivationToken();
+
+    const userToCreate: any = {
+      email: emailLowerCase,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      activationToken,
+    };
+
+    return await this.prismaService.user.create({
+      data: userToCreate,
+    });
+  }
+
+  async activateUser(activationToken: string, password: string): Promise<void> {
+    const user = await this.prismaService.user.findUnique({
+      where: { activationToken },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid activation token');
     }
 
-    return this.prismaService.user.create({
+    const passwordHash = await this.passwordService.hashPassword(password);
+
+    await this.prismaService.user.update({
+      where: { id: user.id },
       data: {
-        email: emailLowerCase,
         password: passwordHash,
-        role: roleUpperCase as Role,
-        firstName: userData.firstName,
-        lastName: userData.lastName,
-        phone: userData.phone,
+        activationToken: null,
+        role: Role.MANAGER,
+        isActive: true,
       },
+    });
+  }
+
+  private generateActivationToken(): string {
+    const length = 10;
+    const characters =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    for (let i = 0; i < length; i++) {
+      token += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return token;
+  }
+
+  async getUserById(id: number): Promise<User | null> {
+    return this.prismaService.user.findUnique({ where: { id } });
+  }
+
+  async updateUser(
+    userId: number,
+    userData: Partial<CreateUserDto>,
+  ): Promise<User> {
+    return await this.prismaService.user.update({
+      where: { id: userId },
+      data: userData,
     });
   }
 

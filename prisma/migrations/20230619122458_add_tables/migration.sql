@@ -15,15 +15,17 @@ CREATE TABLE `groups` (
 CREATE TABLE `users` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `email` VARCHAR(191) NOT NULL,
-    `password` VARCHAR(191) NOT NULL,
-    `role` ENUM('ADMIN', 'MANAGER') NOT NULL,
+    `password` VARCHAR(191) NULL,
+    `role` ENUM('ADMIN', 'MANAGER') NULL,
     `firstName` VARCHAR(191) NULL,
     `lastName` VARCHAR(191) NULL,
     `phone` VARCHAR(191) NULL,
     `isActive` BOOLEAN NOT NULL DEFAULT false,
     `lastLogin` DATETIME(3) NULL,
+    `activationToken` VARCHAR(191) NULL,
 
     UNIQUE INDEX `users_email_key`(`email`),
+    UNIQUE INDEX `users_activationToken_key`(`activationToken`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

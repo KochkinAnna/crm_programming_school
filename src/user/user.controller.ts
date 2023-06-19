@@ -1,18 +1,22 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Delete,
-  NotFoundException,
-  ConflictException,
   BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  ForbiddenException,
+  Get,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/createUser.dto';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
+import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
 
 @Controller('users')
 @ApiTags('User')
@@ -20,21 +24,51 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create a user' })
+  @ApiCreatedResponse({ description: 'The created user', type: CreateUserDto })
   async createUser(@Body() userData: CreateUserDto): Promise<User> {
     try {
-      const existingUser = await this.userService.getUserByEmail(
-        userData.email,
-      );
-      if (existingUser) {
-        throw new ConflictException('User with this email already exists');
-      }
-      return this.userService.createUser(userData);
+      return await this.userService.createUser(userData);
     } catch (error) {
       if (error instanceof BadRequestException) {
         throw new BadRequestException(error.message);
       }
       throw error;
     }
+  }
+
+  @Patch('/activate/:activationToken')
+  @ApiOperation({ summary: 'Activate a user' })
+  @ApiCreatedResponse({ description: 'User activated successfully' })
+  async activateUser(
+    @Param('activationToken') activationToken: string,
+    @Body('password') password: string,
+  ): Promise<void> {
+    return this.userService.activateUser(activationToken, password);
+  }
+
+  @Patch('/:id')
+  @ApiOperation({ summary: 'Update user by ID' })
+  @ApiCreatedResponse({ description: 'The updated user', type: CreateUserDto })
+  @UseGuards(JwtAuthGuard)
+  async updateUser(
+    @Param('id') id: string,
+    @Body() userData: Partial<CreateUserDto>,
+    @Req() req,
+  ): Promise<User> {
+    const parsedUserId = parseInt(id);
+
+    if (isNaN(parsedUserId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    const user: User = req.user;
+
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can update user information');
+    }
+
+    return await this.userService.updateUser(parsedUserId, userData);
   }
 
   @Get()

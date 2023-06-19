@@ -47,16 +47,17 @@ enum Role {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  email         String    @unique
-  password      String
-  role          Role
-  firstName     String?
-  lastName      String?
-  phone         String?
-  isActive      Boolean   @default(false)
-  lastLogin     DateTime?
-  managedOrders Order[]   @relation("ManagerToOrder")
+  id              Int       @id @default(autoincrement())
+  email           String    @unique
+  password        String?
+  role            Role?
+  firstName       String?
+  lastName        String?
+  phone           String?
+  isActive        Boolean   @default(false)
+  lastLogin       DateTime?
+  activationToken String?   @unique
+  managedOrders   Order[]   @relation("ManagerToOrder")
 
   @@map("users")
 }

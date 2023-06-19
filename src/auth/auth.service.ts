@@ -18,7 +18,7 @@ export class AuthService {
   async validateUser(email: string, pass: string): Promise<User | null> {
     if (email === adminCredential.email && pass === adminCredential.password) {
       const adminUser: Partial<User> = {
-        id: 1,
+        id: adminCredential.id,
         email: adminCredential.email,
         password: adminCredential.password,
         role: 'ADMIN',
