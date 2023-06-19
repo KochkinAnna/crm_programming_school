@@ -3,6 +3,7 @@ import { PrismaService } from '../common/orm/prisma.service';
 import { Role, User } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
+import { generateActivationToken } from '../common/utils/token.utils';
 
 @Injectable()
 export class UserService {
@@ -14,8 +15,7 @@ export class UserService {
   async createUser(userData: CreateUserDto): Promise<User> {
     const emailLowerCase = userData.email.toLowerCase();
 
-    const activationToken = this.generateActivationToken();
-
+    const activationToken = generateActivationToken();
     const userToCreate: any = {
       email: emailLowerCase,
       firstName: userData.firstName,
@@ -48,17 +48,6 @@ export class UserService {
         isActive: true,
       },
     });
-  }
-
-  private generateActivationToken(): string {
-    const length = 10;
-    const characters =
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let token = '';
-    for (let i = 0; i < length; i++) {
-      token += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return token;
   }
 
   async getUserById(id: number): Promise<User | null> {
