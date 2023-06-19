@@ -85,13 +85,21 @@ export class OrderService {
       throw new NotFoundException('Order not found');
     }
 
-    if (user.role === 'MANAGER' && order.managerId !== user.userId) {
+    if (
+      user.role === 'MANAGER' &&
+      order.managerId !== user.userId &&
+      order.managerId !== null
+    ) {
       throw new UnauthorizedException(
         "You are not allowed to update this order. It's order of another manager.",
       );
     }
 
     const updateParams = this.buildUpdateParams(data);
+
+    updateParams.manager = { connect: { id: user.userId } };
+    updateParams.status = EStatus.IN_WORK;
+
     return this.prismaService.order.update({
       where: { id: parseInt(id, 10) },
       data: updateParams,
