@@ -98,28 +98,27 @@ export class OrderService {
 
     const updateParams = this.buildUpdateParams(data);
 
-    if (
-      data.status &&
-      Object.values(EStatus).includes(data.status.toUpperCase())
-    ) {
+    if (data.hasOwnProperty('status')) {
       const status = data.status.toUpperCase();
-      if (status === EStatus.NEW) {
-        updateParams.manager = { disconnect: true };
+      if (Object.values(EStatus).includes(status)) {
+        if (status === EStatus.NEW) {
+          updateParams.manager = { disconnect: true };
+        }
         updateParams.status = status.toLowerCase();
       } else {
-        updateParams.status = status.toLowerCase();
-        if (
-          user.role !== Role.ADMIN &&
-          user.managerId !== undefined &&
-          user.managerId !== null
-        ) {
-          updateParams.manager = { connect: { id: user.userId } };
-        }
+        throw new BadRequestException(
+          "Invalid status value. You can write only such options: 'In work','New','Agree','Disagree','Dubbing'",
+        );
       }
-    } else {
-      throw new BadRequestException(
-        "Invalid status value. You can write only such options: 'In work','New','Agree','Disagree','Dubbing'",
-      );
+    } else if (
+      !data.hasOwnProperty('status') &&
+      order.status !== EStatus.IN_WORK
+    ) {
+      updateParams.status = EStatus.IN_WORK.toLowerCase();
+    }
+
+    if (!data.hasOwnProperty('manager') && !order.managerId) {
+      updateParams.manager = { connect: { id: user.userId } };
     }
 
     return this.prismaService.order.update({
