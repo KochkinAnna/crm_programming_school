@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './strategy/constants';
-import { User } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { LoginDto } from './dto/login.dto';
 import { adminCredential } from '../common/credential/admin-credential';
 import { ITokenPayload } from '../common/interface/tokenPayload.interface';
@@ -31,6 +31,12 @@ export class AuthService {
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
       throw new BadRequestException('Invalid login data');
+    }
+
+    if (!user.isActive && user.role !== Role.ADMIN) {
+      throw new BadRequestException(
+        "You have been blocked by the admin. Contact him, and don't forget to bring him a chocolate bar",
+      );
     }
 
     const isPasswordValid =

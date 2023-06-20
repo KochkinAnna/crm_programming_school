@@ -13,16 +13,11 @@ export class CommentService {
     orderId: number,
     user,
   ) {
-    if (!user.isActive && user.role !== Role.ADMIN) {
-      throw new BadRequestException(
-        "You have been blocked by the admin. Contact him, and don't forget to bring him a chocolate bar",
-      );
-    }
-
     const order = await this.prismaService.order.findUnique({
       where: { id: orderId },
       include: { manager: true },
     });
+
     if (
       order?.manager &&
       order.manager.id !== user.userId &&
@@ -36,14 +31,18 @@ export class CommentService {
     const commentData = {
       text: createCommentDto.text,
     };
+
     if (!user) {
       throw new BadRequestException('Invalid user object or missing user ID');
     }
 
-    const orderData = {
-      managerId: user.userId,
+    const orderData: { status: string; managerId?: number } = {
       status: order?.status ?? EStatus.IN_WORK,
     };
+
+    if (!order?.manager) {
+      orderData.managerId = user.userId;
+    }
 
     const comment = await this.prismaService.comment.create({
       data: {
@@ -51,10 +50,12 @@ export class CommentService {
         order: { connect: { id: orderId } },
       },
     });
+
     await this.prismaService.order.update({
       where: { id: orderId },
       data: orderData,
     });
+
     return comment;
   }
 

@@ -77,12 +77,6 @@ export class OrderService {
   }
 
   async updateOrder(id: string, data, user): Promise<Order | null> {
-    if (!user.isActive && user.role !== Role.ADMIN) {
-      throw new BadRequestException(
-        "You have been blocked by the admin. Contact him, and don't forget to bring him a chocolate bar",
-      );
-    }
-
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
       include: { group: true, manager: orderIncludes.manager },
