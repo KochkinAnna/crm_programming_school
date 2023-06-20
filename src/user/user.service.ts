@@ -16,7 +16,6 @@ export class UserService {
     userData: CreateUserDto,
   ): Promise<{ activationToken: string }> {
     const emailLowerCase = userData.email.toLowerCase();
-
     const activationToken = generateActivationToken();
     const userToCreate = {
       email: emailLowerCase,
@@ -26,11 +25,23 @@ export class UserService {
       activationToken,
     };
 
-    await this.prismaService.user.create({
-      data: userToCreate,
-    });
+    try {
+      await this.prismaService.user.create({
+        data: userToCreate,
+      });
 
-    return { activationToken };
+      return { activationToken };
+    } catch (error) {
+      if (
+        error.message.includes(
+          'Unique constraint failed on the constraint: `users_email_key`',
+        )
+      ) {
+        throw new BadRequestException('User with this email already exists');
+      }
+
+      throw error;
+    }
   }
 
   async activateUser(activationToken: string, password: string): Promise<any> {

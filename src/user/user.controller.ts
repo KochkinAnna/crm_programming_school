@@ -26,11 +26,20 @@ export class UserController {
   @Post()
   @ApiOperation({ summary: 'Create a user' })
   @ApiCreatedResponse({ description: 'The created user', type: CreateUserDto })
+  @UseGuards(JwtAuthGuard)
   async createUser(
     @Body() userData: CreateUserDto,
+    @Req() req,
   ): Promise<{ activationToken: string }> {
     try {
       const createdUser = await this.userService.createUser(userData);
+
+      const user: User = req.user;
+
+      if (user.role !== Role.ADMIN) {
+        throw new ForbiddenException('Only admins can post user');
+      }
+
       return { activationToken: createdUser.activationToken };
     } catch (error) {
       if (error instanceof BadRequestException) {
