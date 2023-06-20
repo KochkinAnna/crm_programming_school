@@ -89,11 +89,7 @@ export class OrderService {
       throw new NotFoundException('Order not found');
     }
 
-    if (
-      user.role === Role.MANAGER &&
-      order.managerId !== user.userId &&
-      order.managerId !== null
-    ) {
+    if (order.managerId !== user.userId && order.managerId !== null) {
       throw new UnauthorizedException(
         "You are not allowed to update this order. It's order of another manager.",
       );
