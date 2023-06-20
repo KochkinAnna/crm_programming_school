@@ -74,6 +74,50 @@ export class UserController {
     return await this.userService.updateUser(parsedUserId, userData);
   }
 
+  @Patch('/ban/:id')
+  @ApiOperation({ summary: 'Ban a manager' })
+  @ApiCreatedResponse({ description: 'Manager banned successfully' })
+  @UseGuards(JwtAuthGuard)
+  async banManager(
+    @Param('id') id: string,
+    @Req() req,
+  ): Promise<{ isActive: boolean }> {
+    const parsedUserId = parseInt(id);
+
+    if (isNaN(parsedUserId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    const adminUser: User = req.user;
+    if (adminUser.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can ban managers');
+    }
+
+    return await this.userService.updateUserStatus(parsedUserId, false);
+  }
+
+  @Patch('/unban/:id')
+  @ApiOperation({ summary: 'Unban a manager' })
+  @ApiCreatedResponse({ description: 'Manager unbanned successfully' })
+  @UseGuards(JwtAuthGuard)
+  async unbanManager(
+    @Param('id') id: string,
+    @Req() req,
+  ): Promise<{ isActive: boolean }> {
+    const parsedUserId = parseInt(id);
+
+    if (isNaN(parsedUserId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    const adminUser: User = req.user;
+    if (adminUser.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can unban managers');
+    }
+
+    return await this.userService.updateUserStatus(parsedUserId, true);
+  }
+
   @Get()
   @ApiOperation({ summary: 'Get all users' })
   @ApiCreatedResponse({

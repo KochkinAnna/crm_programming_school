@@ -86,6 +86,8 @@ export class UserService {
         firstName: true,
         lastName: true,
         phone: true,
+        isActive: true,
+        lastLogin: true,
       },
     });
   }
@@ -107,5 +109,17 @@ export class UserService {
       where: { id: userId },
       data: { lastLogin: new Date() },
     });
+  }
+
+  async updateUserStatus(
+    userId: number,
+    isActive: boolean,
+  ): Promise<{ isActive: boolean }> {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { isActive },
+    });
+
+    return { isActive };
   }
 }
