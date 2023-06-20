@@ -125,14 +125,29 @@ export class UserController {
     type: CreateUserDto,
     isArray: true,
   })
-  async getUsers(): Promise<Partial<User>[]> {
+  @UseGuards(JwtAuthGuard)
+  async getUsers(@Req() req): Promise<Partial<User>[]> {
+    const adminUser: User = req.user;
+    if (adminUser.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can get all users');
+    }
+
     return this.userService.getUsers();
   }
 
   @Get('/:email')
   @ApiOperation({ summary: 'Get user by email' })
   @ApiCreatedResponse({ description: 'The user', type: CreateUserDto })
-  async getUserByEmail(@Param('email') email: string): Promise<User | null> {
+  @UseGuards(JwtAuthGuard)
+  async getUserByEmail(
+    @Param('email') email: string,
+    @Req() req,
+  ): Promise<User | null> {
+    const adminUser: User = req.user;
+    if (adminUser.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can get user by email');
+    }
+
     const user = await this.userService.getUserByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
@@ -143,7 +158,16 @@ export class UserController {
   @Delete('/:email')
   @ApiOperation({ summary: 'Delete user by email' })
   @ApiCreatedResponse({ description: 'The deleted user', type: CreateUserDto })
-  async deleteUserByEmail(@Param('email') email: string): Promise<void> {
+  @UseGuards(JwtAuthGuard)
+  async deleteUserByEmail(
+    @Param('email') email: string,
+    @Req() req,
+  ): Promise<void> {
+    const adminUser: User = req.user;
+    if (adminUser.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can delete user by email');
+    }
+
     try {
       await this.userService.deleteUserByEmail(email);
     } catch (error) {
