@@ -98,8 +98,29 @@ export class OrderService {
 
     const updateParams = this.buildUpdateParams(data);
 
-    updateParams.manager = { connect: { id: user.userId } };
-    updateParams.status = EStatus.IN_WORK;
+    if (
+      data.status &&
+      Object.values(EStatus).includes(data.status.toUpperCase())
+    ) {
+      const status = data.status.toUpperCase();
+      if (status === EStatus.NEW) {
+        updateParams.manager = { disconnect: true };
+        updateParams.status = status.toLowerCase();
+      } else {
+        updateParams.status = status.toLowerCase();
+        if (
+          user.role !== Role.ADMIN &&
+          user.managerId !== undefined &&
+          user.managerId !== null
+        ) {
+          updateParams.manager = { connect: { id: user.userId } };
+        }
+      }
+    } else {
+      throw new BadRequestException(
+        "Invalid status value. You can write only such options: 'In work','New','Agree','Disagree','Dubbing'",
+      );
+    }
 
     return this.prismaService.order.update({
       where: { id: parseInt(id, 10) },
@@ -118,10 +139,6 @@ export class OrderService {
           ? { connect: { id: groupId } }
           : undefined,
     };
-
-    if (updateData.status === EStatus.NEW) {
-      updateParams.manager = { disconnect: true };
-    }
 
     return updateParams;
   }

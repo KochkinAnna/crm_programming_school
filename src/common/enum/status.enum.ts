@@ -1,7 +1,7 @@
 export enum EStatus {
-  IN_WORK = 'In work',
-  NEW = 'New',
-  AGREE = 'Agree',
-  DISAGREE = 'Disagree',
-  DUBBING = 'Dubbing',
+  IN_WORK = 'IN_WORK',
+  NEW = 'NEW',
+  AGREE = 'AGREE',
+  DISAGREE = 'DISAGREE',
+  DUBBING = 'DUBBING',
 }
