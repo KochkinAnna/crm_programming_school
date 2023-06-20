@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './strategy/constants';
@@ -41,7 +41,7 @@ export class AuthService {
       throw new BadRequestException('Invalid login data');
     }
 
-    return user;
+    return await this.userService.updateLastLogin(user.id);
   }
 
   async login(loginDto: LoginDto) {

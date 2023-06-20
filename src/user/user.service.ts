@@ -101,4 +101,11 @@ export class UserService {
     const lowercaseEmail = email.toLowerCase();
     await this.prismaService.user.delete({ where: { email: lowercaseEmail } });
   }
+
+  async updateLastLogin(userId: number): Promise<User> {
+    return await this.prismaService.user.update({
+      where: { id: userId },
+      data: { lastLogin: new Date() },
+    });
+  }
 }
