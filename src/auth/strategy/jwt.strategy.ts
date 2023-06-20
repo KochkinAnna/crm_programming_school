@@ -17,11 +17,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     sub: number;
     username: string;
     role: string;
-  }): Promise<{ userId: number; username: string; role: string }> {
+    isActive: boolean;
+  }): Promise<{
+    userId: number;
+    username: string;
+    role: string;
+    isActive: boolean;
+  }> {
     return {
       userId: payload.sub,
       username: payload.username,
       role: payload.role,
+      isActive: payload.isActive,
     };
   }
 }

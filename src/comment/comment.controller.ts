@@ -17,9 +17,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CommentService } from './comment.service';
-import { Comment, User } from '@prisma/client';
+import { Comment, Role, User } from '@prisma/client';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
+import { ERole } from '../common/enum/role.enum';
 
 @Controller('comments')
 @ApiTags('Comments')
@@ -47,7 +48,7 @@ export class CommentController {
     }
 
     const user: User = req.user;
-
+    console.log(user);
     if (!user) {
       throw new UnauthorizedException('Invalid user');
     }

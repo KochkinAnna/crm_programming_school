@@ -22,6 +22,7 @@ export class AuthService {
         email: adminCredential.email,
         password: adminCredential.password,
         role: 'ADMIN',
+        isActive: true,
       };
 
       return adminUser as User;
@@ -51,12 +52,14 @@ export class AuthService {
       username: user.email,
       sub: user.id,
       role: user.role,
+      isActive: user.isActive,
     };
 
     const refreshTokenPayload: ITokenPayload = {
       username: user.email,
       sub: user.id,
       role: user.role,
+      isActive: user.isActive,
       refreshToken: true,
     };
 
@@ -95,6 +98,7 @@ export class AuthService {
         username: user.email,
         sub: user.id,
         role: user.role,
+        isActive: user.isActive,
       };
       const newAccessToken = this.jwtService.sign(accessTokenPayload, {
         secret: jwtConstants.secret,
@@ -105,6 +109,7 @@ export class AuthService {
         username: user.email,
         sub: user.id,
         role: user.role,
+        isActive: user.isActive,
         refreshToken: true,
       };
 

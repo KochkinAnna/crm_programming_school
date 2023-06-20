@@ -1,11 +1,12 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
-import { Order, Prisma } from '@prisma/client';
+import { Order, Prisma, Role } from '@prisma/client';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 import { EStatus } from '../common/enum/status.enum';
 import { FilterUtil } from '../common/utils/filter.util';
@@ -76,6 +77,12 @@ export class OrderService {
   }
 
   async updateOrder(id: string, data, user): Promise<Order | null> {
+    if (!user.isActive && user.role !== Role.ADMIN) {
+      throw new BadRequestException(
+        "You have been blocked by the admin. Contact him, and don't forget to bring him a chocolate bar",
+      );
+    }
+
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
       include: { group: true, manager: orderIncludes.manager },
@@ -86,7 +93,7 @@ export class OrderService {
     }
 
     if (
-      user.role === 'MANAGER' &&
+      user.role === Role.MANAGER &&
       order.managerId !== user.userId &&
       order.managerId !== null
     ) {
