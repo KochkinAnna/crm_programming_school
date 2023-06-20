@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
-import { Comment, Role } from '@prisma/client';
+import { Comment } from '@prisma/client';
 import { CreateCommentDto } from './dto/createComment.dto';
 import { EStatus } from '../common/enum/status.enum';
 
@@ -18,11 +18,7 @@ export class CommentService {
       include: { manager: true },
     });
 
-    if (
-      order?.manager &&
-      order.manager.id !== user.userId &&
-      user.role === Role.MANAGER
-    ) {
+    if (order?.manager && order.manager.id !== user.userId) {
       throw new BadRequestException(
         'Cannot add comment to an order with an assigned manager',
       );

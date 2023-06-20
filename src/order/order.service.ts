@@ -10,6 +10,9 @@ import { Order, Prisma, Role } from '@prisma/client';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 import { EStatus } from '../common/enum/status.enum';
 import { FilterUtil } from '../common/utils/filter.util';
+import { ECourseType } from '../common/enum/course-type.enum';
+import { ECourseFormat } from '../common/enum/course-format.enum';
+import { ECourse } from '../common/enum/course.enum';
 
 @Injectable()
 export class OrderService {
@@ -107,7 +110,9 @@ export class OrderService {
         updateParams.status = status.toLowerCase();
       } else {
         throw new BadRequestException(
-          "Invalid status value. You can write only such options: 'In work','New','Agree','Disagree','Dubbing'",
+          `Invalid status value. You can write only such options: ${Object.values(
+            EStatus,
+          ).join(', ')}`,
         );
       }
     } else if (
@@ -117,8 +122,40 @@ export class OrderService {
       updateParams.status = EStatus.IN_WORK.toLowerCase();
     }
 
-    if (!data.hasOwnProperty('manager') && !order.managerId) {
-      updateParams.manager = { connect: { id: user.userId } };
+    if (data.hasOwnProperty('course')) {
+      const course = data.course.toUpperCase();
+      if (!Object.values(ECourse).includes(course)) {
+        throw new BadRequestException(
+          `Invalid course value. You can write only such options: ${Object.values(
+            ECourse,
+          ).join(', ')}`,
+        );
+      }
+      updateParams.course = course;
+    }
+
+    if (data.hasOwnProperty('course_format')) {
+      const courseFormat = data.course_format.toLowerCase();
+      if (!Object.values(ECourseFormat).includes(courseFormat)) {
+        throw new BadRequestException(
+          `Invalid course format value. You can write only such options: ${Object.values(
+            ECourseFormat,
+          ).join(', ')}`,
+        );
+      }
+      updateParams.course_format = courseFormat;
+    }
+
+    if (data.hasOwnProperty('course_type')) {
+      const courseType = data.course_type.toLowerCase();
+      if (!Object.values(ECourseType).includes(courseType)) {
+        throw new BadRequestException(
+          `Invalid course type value. You can write only such options: ${Object.values(
+            ECourseType,
+          ).join(', ')}`,
+        );
+      }
+      updateParams.course_type = courseType;
     }
 
     return this.prismaService.order.update({
@@ -131,14 +168,12 @@ export class OrderService {
   private buildUpdateParams(data) {
     const { groupId, ...updateData } = data;
 
-    const updateParams: Prisma.OrderUpdateInput = {
+    return {
       ...updateData,
       group:
         groupId !== undefined && groupId !== null
           ? { connect: { id: groupId } }
           : undefined,
     };
-
-    return updateParams;
   }
 }
