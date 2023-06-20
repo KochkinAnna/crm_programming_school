@@ -52,7 +52,7 @@ export class AuthService {
       sub: user.id,
       role: user.role,
     };
-    console.log(accessTokenPayload);
+
     const refreshTokenPayload: ITokenPayload = {
       username: user.email,
       sub: user.id,
