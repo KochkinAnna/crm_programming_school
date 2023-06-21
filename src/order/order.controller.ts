@@ -9,6 +9,7 @@ import {
   Patch,
   Query,
   Req,
+  Res,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -25,6 +26,9 @@ import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.respon
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
 import { Order, Role, User } from '@prisma/client';
 import { PaginationQuery } from '../common/swagger-helper/paginationQuery.apidecorator';
+import { Response } from 'express';
+import * as ExcelJS from 'exceljs';
+import { ExcelUtil } from '../common/utils/excel.util';
 
 @Controller('orders')
 @ApiTags('Order')
@@ -142,5 +146,85 @@ export class OrderController {
     }
 
     return this.orderService.getOrderStatistics();
+  }
+
+  @Get('/excel')
+  @ApiOperation({ summary: 'Get orders as Excel file' })
+  @UseGuards(JwtAuthGuard)
+  async getOrdersExcel(
+    @Res() res: Response,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+    @Query('sort') sort?: string,
+    @Query('filter') filter?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ): Promise<void> {
+    const orders = await this.getPaginatedOrders(
+      page,
+      limit,
+      sort,
+      filter,
+      startDate,
+      endDate,
+    );
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Orders');
+
+    const headers = [
+      'ID',
+      'Name',
+      'Surname',
+      'Email',
+      'Phone',
+      'Age',
+      'Course',
+      'Course Format',
+      'Course Type',
+      'Status',
+      'Sum',
+      'Already Paid',
+      'Group',
+      'Created At',
+      'UTM',
+      'Message',
+      'Manager',
+    ];
+
+    ExcelUtil.addHeaderRow(worksheet, headers);
+
+    for (const order of orders.data) {
+      worksheet.addRow([
+        order.id,
+        order.name,
+        order.surname,
+        order.email,
+        order.phone,
+        order.age,
+        order.course,
+        order.course_format,
+        order.course_type,
+        order.status,
+        order.sum,
+        order.alreadyPaid,
+        order.groupId,
+        order.created_at,
+        order.utm,
+        order.msg,
+        order.managerId,
+      ]);
+    }
+
+    ExcelUtil.applyStyles(worksheet);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
+
+    await workbook.xlsx.write(res);
+    res.end();
   }
 }
