@@ -4,6 +4,7 @@ import { Role, User } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
 import { generateActivationToken } from '../common/utils/activationToken.utils';
+import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
 
 @Injectable()
 export class UserService {
@@ -19,8 +20,8 @@ export class UserService {
     const activationToken = generateActivationToken();
     const userToCreate = {
       email: emailLowerCase,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
+      firstName: capitalizeFirstLetter(userData.firstName),
+      lastName: capitalizeFirstLetter(userData.lastName),
       role: Role.MANAGER,
       phone: userData.phone,
       activationToken,
@@ -83,9 +84,23 @@ export class UserService {
     userId: number,
     userData: Partial<CreateUserDto>,
   ): Promise<User> {
+    const updatedUserData: Partial<CreateUserDto> = {};
+
+    if (userData.email) {
+      updatedUserData.email = userData.email.toLowerCase();
+    }
+
+    if (userData.firstName) {
+      updatedUserData.firstName = capitalizeFirstLetter(userData.firstName);
+    }
+
+    if (userData.lastName) {
+      updatedUserData.lastName = capitalizeFirstLetter(userData.lastName);
+    }
+
     return await this.prismaService.user.update({
       where: { id: userId },
-      data: userData,
+      data: updatedUserData,
     });
   }
 
