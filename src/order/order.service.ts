@@ -13,6 +13,7 @@ import { FilterUtil } from '../common/utils/filter.util';
 import { ECourseType } from '../common/enum/course-type.enum';
 import { ECourseFormat } from '../common/enum/course-format.enum';
 import { ECourse } from '../common/enum/course.enum';
+import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
 
 @Injectable()
 export class OrderService {
@@ -158,6 +159,14 @@ export class OrderService {
 
     if (data.hasOwnProperty('email')) {
       updateParams.email = data.email.toLowerCase();
+    }
+
+    if (data.hasOwnProperty('name')) {
+      updateParams.name = capitalizeFirstLetter(data.name);
+    }
+
+    if (data.hasOwnProperty('surname')) {
+      updateParams.surname = capitalizeFirstLetter(data.surname);
     }
 
     return this.prismaService.order.update({
