@@ -156,6 +156,10 @@ export class OrderService {
       updateParams.course_type = courseType;
     }
 
+    if (data.hasOwnProperty('email')) {
+      updateParams.email = data.email.toLowerCase();
+    }
+
     return this.prismaService.order.update({
       where: { id: parseInt(id, 10) },
       data: updateParams,
