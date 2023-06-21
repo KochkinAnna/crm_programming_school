@@ -20,7 +20,7 @@ export class ExcelUtil {
     style: any,
   ): void {
     worksheet.columns.forEach((column) => {
-      if (columns.includes(column.header.toString())) {
+      if (column.header && columns.includes(column.header.toString())) {
         column.eachCell((cell) => {
           Object.assign(cell, style);
         });

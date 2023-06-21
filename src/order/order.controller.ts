@@ -150,7 +150,7 @@ export class OrderController {
 
   @Get('/excel')
   @ApiOperation({ summary: 'Get orders as Excel file' })
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   async getOrdersExcel(
     @Res() res: Response,
     @Query('page') page?: number,
