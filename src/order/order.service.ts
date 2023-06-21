@@ -172,4 +172,57 @@ export class OrderService {
           : undefined,
     };
   }
+
+  async getOrderStatisticsByUser(userId: number): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      include: { managedOrders: true },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const orders = user.managedOrders;
+
+    const orderCount = orders.length;
+    const statusCount = {};
+
+    for (const order of orders) {
+      const status = order.status;
+
+      if (!statusCount[status]) {
+        statusCount[status] = 0;
+      }
+
+      statusCount[status]++;
+    }
+
+    return {
+      orderCount,
+      statusCount,
+    };
+  }
+
+  async getOrderStatistics(): Promise<any> {
+    const orders = await this.prismaService.order.findMany();
+
+    const orderCount = orders.length;
+    const statusCount = {};
+
+    for (const order of orders) {
+      const status = order.status;
+
+      if (!statusCount[status]) {
+        statusCount[status] = 0;
+      }
+
+      statusCount[status]++;
+    }
+
+    return {
+      orderCount,
+      statusCount,
+    };
+  }
 }

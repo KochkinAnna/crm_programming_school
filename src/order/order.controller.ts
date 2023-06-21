@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  ForbiddenException,
   Get,
   NotFoundException,
   Param,
@@ -12,6 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
+  ApiCreatedResponse,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
@@ -21,7 +23,7 @@ import { OrderService } from './order.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { paginatedOrdersResponse } from '../common/swagger-helper/swagger.responses';
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
-import { Order, User } from '@prisma/client';
+import { Order, Role, User } from '@prisma/client';
 import { PaginationQuery } from '../common/swagger-helper/paginationQuery.apidecorator';
 
 @Controller('orders')
@@ -107,5 +109,38 @@ export class OrderController {
   @UseGuards(JwtAuthGuard)
   async getUserOrders(@Param('userId') userId: string): Promise<Order[]> {
     return await this.orderService.getUserOrders(userId);
+  }
+
+  @Get('/statistics/user/:userId')
+  @ApiOperation({ summary: 'Get order statistics by user ID' })
+  @ApiCreatedResponse({ description: 'Order statistics' })
+  @UseGuards(JwtAuthGuard)
+  async getOrderStatisticsByUser(
+    @Param('userId') userId: string,
+    @Req() req,
+  ): Promise<any> {
+    const parsedUserId = parseInt(userId);
+
+    const user: User = req.user;
+
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can access order statistics');
+    }
+
+    return this.orderService.getOrderStatisticsByUser(parsedUserId);
+  }
+
+  @Get('/statistics')
+  @ApiOperation({ summary: 'Get order statistics' })
+  @ApiCreatedResponse({ description: 'Order statistics' })
+  @UseGuards(JwtAuthGuard)
+  async getOrderStatistics(@Req() req): Promise<any> {
+    const user: User = req.user;
+
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can access order statistics');
+    }
+
+    return this.orderService.getOrderStatistics();
   }
 }

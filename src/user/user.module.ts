@@ -10,6 +10,8 @@ import { AuthService } from '../auth/auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { CommentModule } from '../comment/comment.module';
 import { CommentService } from '../comment/comment.service';
+import { OrderModule } from '../order/order.module';
+import { OrderService } from '../order/order.service';
 
 @Module({
   imports: [
