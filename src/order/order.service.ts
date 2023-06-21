@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
 import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
-import { Order, Prisma, Role } from '@prisma/client';
+import { Order, Prisma } from '@prisma/client';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 import { EStatus } from '../common/enum/status.enum';
 import { FilterUtil } from '../common/utils/filter.util';
@@ -98,7 +98,7 @@ export class OrderService {
     const updateParams = this.buildUpdateParams(data);
 
     if (data.hasOwnProperty('status')) {
-      const status = data.status.toUpperCase();
+      const status = data.status.toLowerCase();
       if (Object.values(EStatus).includes(status)) {
         if (status === EStatus.NEW) {
           updateParams.manager = { disconnect: true };
