@@ -22,6 +22,7 @@ export class UserService {
       firstName: userData.firstName,
       lastName: userData.lastName,
       role: Role.MANAGER,
+      phone: userData.phone,
       activationToken,
     };
 

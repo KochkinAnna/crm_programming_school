@@ -95,13 +95,15 @@ export class OrderService {
       );
     }
 
-    const updateParams = this.buildUpdateParams(data);
+    const updateParams = this.buildUpdateParams(data, user);
 
     if (data.hasOwnProperty('status')) {
       const status = data.status.toLowerCase();
       if (Object.values(EStatus).includes(status)) {
         if (status === EStatus.NEW) {
-          updateParams.manager = { disconnect: true };
+          updateParams.managerId = null;
+        } else {
+          updateParams.managerId = user.userId;
         }
         updateParams.status = status.toLowerCase();
       } else {
@@ -161,16 +163,19 @@ export class OrderService {
     });
   }
 
-  private buildUpdateParams(data) {
+  private buildUpdateParams(data, user) {
     const { groupId, ...updateData } = data;
+    const updateParams = { ...updateData };
 
-    return {
-      ...updateData,
-      group:
-        groupId !== undefined && groupId !== null
-          ? { connect: { id: groupId } }
-          : undefined,
-    };
+    if (Object.keys(updateData).length > 0) {
+      updateParams.managerId = user.userId;
+    }
+
+    if (groupId !== undefined && groupId !== null) {
+      updateParams.group = { connect: { id: groupId } };
+    }
+
+    return updateParams;
   }
 
   async getOrderStatisticsByUser(userId: number): Promise<any> {
