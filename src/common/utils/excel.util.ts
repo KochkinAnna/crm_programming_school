@@ -10,7 +10,7 @@ export class ExcelUtil {
         pattern: 'solid',
         fgColor: { argb: 'ADD8E6' },
       };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.alignment = { vertical: 'top', horizontal: 'center' };
     });
   }
 
@@ -31,7 +31,7 @@ export class ExcelUtil {
       column.width = Math.min(30, Math.max(10, maxLength + 2));
 
       column.eachCell((cell) => {
-        cell.alignment = { wrapText: true };
+        cell.alignment = { wrapText: true, vertical: 'top' };
       });
     });
   }

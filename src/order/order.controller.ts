@@ -194,6 +194,7 @@ export class OrderController {
       'UTM',
       'Message',
       'Manager',
+      'Comment',
     ];
 
     ExcelUtil.addHeaderRow(worksheet, headers);
@@ -234,6 +235,12 @@ export class OrderController {
           })
         : undefined;
 
+      const comments = await this.prismaService.comment.findMany({
+        where: {
+          orderId: order.id,
+        },
+      });
+
       worksheet.addRow([
         id,
         name,
@@ -252,6 +259,7 @@ export class OrderController {
         utm,
         msg,
         manager?.lastName,
+        comments.map((comment) => comment.text).join('\n'),
       ]);
     }
 
