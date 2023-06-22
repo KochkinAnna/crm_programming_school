@@ -8,55 +8,31 @@ export class ExcelUtil {
       cell.fill = {
         type: 'pattern',
         pattern: 'solid',
-        fgColor: { argb: 'FF6495ED' },
-      }; // Cornflower Blue (#6495ED)
+        fgColor: { argb: 'ADD8E6' },
+      };
       cell.alignment = { vertical: 'middle', horizontal: 'center' };
     });
   }
 
-  static applyColumnStyle(
-    worksheet: ExcelJS.Worksheet,
-    columns: string[],
-    style: any,
-  ): void {
-    worksheet.columns.forEach((column) => {
-      if (column.header && columns.includes(column.header.toString())) {
-        column.eachCell((cell) => {
-          Object.assign(cell, style);
-        });
-      }
-    });
-  }
-
   static applyStyles(worksheet: ExcelJS.Worksheet): void {
-    const managerGroupColumns = ['Group'];
-    const nameSurnamePhoneColumns = ['Name', 'Surname', 'Phone'];
-
-    const managerGroupStyle = {
-      fill: {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFFFFF00' },
-      }, // Жовтий (#FFFF00)
-    };
-
-    const nameSurnamePhoneStyle = {
-      fill: {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFADD8E6' },
-      }, // Світло голубий (#ADD8E6)
-    };
-
-    ExcelUtil.applyColumnStyle(
-      worksheet,
-      managerGroupColumns,
-      managerGroupStyle,
+    const allCells = worksheet.getCell(
+      `A1:${worksheet.getColumn(worksheet.columnCount).letter}1`,
     );
-    ExcelUtil.applyColumnStyle(
-      worksheet,
-      nameSurnamePhoneColumns,
-      nameSurnamePhoneStyle,
-    );
+    allCells.fill = null;
+
+    worksheet.columns.forEach((column) => {
+      let maxLength = 0;
+      column.eachCell({ includeEmpty: true }, (cell) => {
+        const cellLength = cell.value ? cell.value.toString().length : 0;
+        if (cellLength > maxLength) {
+          maxLength = cellLength;
+        }
+      });
+      column.width = Math.min(30, Math.max(10, maxLength + 2));
+
+      column.eachCell((cell) => {
+        cell.alignment = { wrapText: true };
+      });
+    });
   }
 }
