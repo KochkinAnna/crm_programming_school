@@ -29,11 +29,15 @@ import { PaginationQuery } from '../common/swagger-helper/paginationQuery.apidec
 import { Response } from 'express';
 import * as ExcelJS from 'exceljs';
 import { ExcelUtil } from '../common/utils/excel.util';
+import { PrismaService } from '../common/orm/prisma.service';
 
 @Controller('orders')
 @ApiTags('Order')
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly prismaService: PrismaService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'Get paginated orders' })
@@ -195,24 +199,59 @@ export class OrderController {
     ExcelUtil.addHeaderRow(worksheet, headers);
 
     for (const order of orders.data) {
+      const {
+        id,
+        name,
+        surname,
+        email,
+        phone,
+        age,
+        course,
+        course_format,
+        course_type,
+        status,
+        sum,
+        alreadyPaid,
+        groupId,
+        created_at,
+        utm,
+        msg,
+        managerId,
+      } = order;
+
+      const group = groupId
+        ? await this.prismaService.group.findUnique({
+            where: {
+              id: groupId,
+            },
+          })
+        : undefined;
+      const manager = managerId
+        ? await this.prismaService.user.findUnique({
+            where: {
+              id: order.managerId,
+            },
+          })
+        : undefined;
+
       worksheet.addRow([
-        order.id,
-        order.name,
-        order.surname,
-        order.email,
-        order.phone,
-        order.age,
-        order.course,
-        order.course_format,
-        order.course_type,
-        order.status,
-        order.sum,
-        order.alreadyPaid,
-        order.groupId,
-        order.created_at,
-        order.utm,
-        order.msg,
-        order.managerId,
+        id,
+        name,
+        surname,
+        email,
+        phone,
+        age,
+        course,
+        course_format,
+        course_type,
+        status,
+        sum,
+        alreadyPaid,
+        group?.name,
+        created_at,
+        utm,
+        msg,
+        manager?.lastName,
       ]);
     }
 
