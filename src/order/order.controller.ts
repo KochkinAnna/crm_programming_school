@@ -30,6 +30,8 @@ import { Response } from 'express';
 import * as ExcelJS from 'exceljs';
 import { ExcelUtil } from '../common/utils/excel.util';
 import { PrismaService } from '../common/orm/prisma.service';
+import { ExcelColumnHeaders } from '../common/constants/excel.constants';
+import { getOrderRow } from '../common/utils/excel.getOrderRow. util';
 
 @Controller('orders')
 @ApiTags('Order')
@@ -177,57 +179,38 @@ export class OrderController {
     const worksheet = workbook.addWorksheet('Orders');
 
     const headers = [
-      'ID',
-      'Name',
-      'Surname',
-      'Email',
-      'Phone',
-      'Age',
-      'Course',
-      'Course Format',
-      'Course Type',
-      'Status',
-      'Sum',
-      'Already Paid',
-      'Group',
-      'Created At',
-      'UTM',
-      'Message',
-      'Manager',
-      'Comment',
+      ExcelColumnHeaders.ID,
+      ExcelColumnHeaders.Name,
+      ExcelColumnHeaders.Surname,
+      ExcelColumnHeaders.Email,
+      ExcelColumnHeaders.Phone,
+      ExcelColumnHeaders.Age,
+      ExcelColumnHeaders.Course,
+      ExcelColumnHeaders.CourseFormat,
+      ExcelColumnHeaders.CourseType,
+      ExcelColumnHeaders.Status,
+      ExcelColumnHeaders.Sum,
+      ExcelColumnHeaders.AlreadyPaid,
+      ExcelColumnHeaders.Group,
+      ExcelColumnHeaders.CreatedAt,
+      ExcelColumnHeaders.UTM,
+      ExcelColumnHeaders.Message,
+      ExcelColumnHeaders.Manager,
+      ExcelColumnHeaders.Comment,
     ];
 
     ExcelUtil.addHeaderRow(worksheet, headers);
 
     for (const order of orders.data) {
-      const {
-        id,
-        name,
-        surname,
-        email,
-        phone,
-        age,
-        course,
-        course_format,
-        course_type,
-        status,
-        sum,
-        alreadyPaid,
-        groupId,
-        created_at,
-        utm,
-        msg,
-        managerId,
-      } = order;
-
-      const group = groupId
+      const group = order.groupId
         ? await this.prismaService.group.findUnique({
             where: {
-              id: groupId,
+              id: order.groupId,
             },
           })
         : undefined;
-      const manager = managerId
+
+      const manager = order.managerId
         ? await this.prismaService.user.findUnique({
             where: {
               id: order.managerId,
@@ -241,26 +224,8 @@ export class OrderController {
         },
       });
 
-      worksheet.addRow([
-        id,
-        name,
-        surname,
-        email,
-        phone,
-        age,
-        course,
-        course_format,
-        course_type,
-        status,
-        sum,
-        alreadyPaid,
-        group?.name,
-        created_at,
-        utm,
-        msg,
-        manager?.lastName,
-        comments.map((comment) => comment.text).join('\n'),
-      ]);
+      const orderRow = getOrderRow(order, group, manager, comments);
+      worksheet.addRow(orderRow);
     }
 
     ExcelUtil.applyStyles(worksheet);
