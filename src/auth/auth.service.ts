@@ -81,11 +81,19 @@ export class AuthService {
       expiresIn: jwtConstants.refreshTokenExpiresIn,
     });
 
+    // Видалення старих записів з таблиці Token
+    await this.prismaService.token.deleteMany({
+      where: {
+        userId: user.id,
+      },
+    });
+
+    // Оновити токени користувача у базі даних
     await this.prismaService.token.create({
       data: {
+        userId: user.id,
         accessToken,
         refreshToken,
-        userId: user.id,
       },
     });
 
@@ -134,12 +142,19 @@ export class AuthService {
         expiresIn: jwtConstants.refreshTokenExpiresIn,
       });
 
-      // Збереження нових токенів у базі даних
+      // Видалення старих записів з таблиці Token
+      await this.prismaService.token.deleteMany({
+        where: {
+          userId: user.id,
+        },
+      });
+
+      // Оновити токени користувача у базі даних
       await this.prismaService.token.create({
         data: {
+          userId: user.id,
           accessToken: newAccessToken,
           refreshToken: newRefreshToken,
-          userId: user.id,
         },
       });
 
