@@ -1,5 +1,11 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsOptional,
+  IsPhoneNumber,
+  IsString,
+  Length,
+} from 'class-validator';
 import { Role } from '@prisma/client';
 
 export class UpdateUserDto {
@@ -22,6 +28,7 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsString()
+  @Length(4, 25)
   password?: string;
 
   @ApiPropertyOptional({ name: 'role', enum: Role })
@@ -37,6 +44,7 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsString()
+  @Length(2, 25)
   firstName?: string;
 
   @ApiPropertyOptional({
@@ -47,6 +55,7 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsString()
+  @Length(2, 25)
   lastName?: string;
 
   @ApiPropertyOptional({
@@ -57,5 +66,6 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsString()
+  @IsPhoneNumber()
   phone?: string;
 }
