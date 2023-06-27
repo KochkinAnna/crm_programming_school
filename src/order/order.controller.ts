@@ -81,7 +81,7 @@ export class OrderController {
       normalizedLimit,
       sortOrder,
       sortField,
-      filter,
+      filter ? filter.split(',') : undefined,
       startDate,
       endDate,
     );

@@ -24,7 +24,7 @@ export class OrderService {
     limit = 25,
     sort: 'desc' | 'asc' = 'desc',
     sortField: keyof Order = 'id',
-    filter?: string,
+    filter?: string[],
     startDate?: string,
     endDate?: string,
   ): Promise<IPaginatedOrders> {
@@ -39,8 +39,10 @@ export class OrderService {
     const where: Prisma.OrderWhereInput = {};
 
     if (filter) {
-      const filterObject = FilterUtil.generateWhereFilter(filter);
-      Object.assign(where, filterObject);
+      for (const filterItem of filter) {
+        const filterObject = FilterUtil.generateWhereFilter(filterItem);
+        Object.assign(where, filterObject);
+      }
     }
 
     where.created_at = {
