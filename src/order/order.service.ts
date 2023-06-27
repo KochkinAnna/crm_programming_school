@@ -207,7 +207,11 @@ export class OrderService {
     const statusCount = {};
 
     for (const order of orders) {
-      const status = order.status;
+      let status = order.status;
+
+      if (status === null || status === EStatus.NEW) {
+        status = EStatus.NEW;
+      }
 
       if (!statusCount[status]) {
         statusCount[status] = 0;
@@ -229,7 +233,11 @@ export class OrderService {
     const statusCount = {};
 
     for (const order of orders) {
-      const status = order.status;
+      let status = order.status;
+
+      if (status === null || status === EStatus.NEW) {
+        status = EStatus.NEW;
+      }
 
       if (!statusCount[status]) {
         statusCount[status] = 0;
