@@ -29,7 +29,7 @@ export class UserService {
           email: emailLowerCase,
           firstName: capitalizeFirstLetter(userData.firstName),
           lastName: capitalizeFirstLetter(userData.lastName),
-          role: Role.MANAGER,
+          role: Role.ADMIN,
           phone: userData.phone,
         },
       });
@@ -78,11 +78,12 @@ export class UserService {
         return this.generateActivationToken(userId);
       }
 
+      const accessToken = uuid();
       const refreshToken = uuid();
 
       await this.prismaService.token.create({
         data: {
-          accessToken: '',
+          accessToken,
           refreshToken,
           activationToken,
           user: { connect: { id: userId } },

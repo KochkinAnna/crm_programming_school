@@ -6,6 +6,8 @@ ALTER TABLE `orders` ADD COLUMN `groupId` INTEGER NULL,
 CREATE TABLE `groups` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `groups_name_key`(`name`),
     PRIMARY KEY (`id`)
@@ -22,6 +24,8 @@ CREATE TABLE `users` (
     `phone` VARCHAR(191) NULL,
     `isActive` BOOLEAN NOT NULL DEFAULT false,
     `lastLogin` DATETIME(3) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `users_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -33,6 +37,8 @@ CREATE TABLE `tokens` (
     `accessToken` VARCHAR(355) NOT NULL,
     `refreshToken` VARCHAR(355) NOT NULL,
     `activationToken` VARCHAR(355) NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
     `userId` INTEGER NOT NULL,
 
     UNIQUE INDEX `tokens_refreshToken_key`(`refreshToken`),
