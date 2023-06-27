@@ -32,13 +32,13 @@ export class UserController {
     @Req() req,
   ): Promise<{ activationToken: string }> {
     try {
-      const createdUser = await this.userService.createUser(userData);
-
       const user: User = req.user;
 
       if (user.role !== Role.ADMIN) {
         throw new ForbiddenException('Only admins can post user');
       }
+
+      const createdUser = await this.userService.createUser(userData);
 
       return { activationToken: createdUser.activationToken };
     } catch (error) {
@@ -144,7 +144,7 @@ export class UserController {
     return this.userService.getUsers();
   }
 
-  @Get('/:email')
+  @Get('/byEmail/:email')
   @ApiOperation({ summary: 'Get user by email' })
   @ApiCreatedResponse({ description: 'The user', type: CreateUserDto })
   @UseGuards(JwtAuthGuard)
@@ -164,7 +164,7 @@ export class UserController {
     return user;
   }
 
-  @Delete('/:email')
+  @Delete('/byEmail/:email')
   @ApiOperation({ summary: 'Delete user by email' })
   @ApiCreatedResponse({ description: 'The deleted user', type: CreateUserDto })
   @UseGuards(JwtAuthGuard)
@@ -182,5 +182,41 @@ export class UserController {
     } catch (error) {
       throw new NotFoundException('User not found');
     }
+  }
+
+  @Get('/byID/:id')
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiCreatedResponse({ description: 'The user', type: CreateUserDto })
+  @UseGuards(JwtAuthGuard)
+  async getUserById(@Param('id') id: string, @Req() req): Promise<User | null> {
+    const adminUser: User = req.user;
+    if (adminUser.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can get user by ID');
+    }
+
+    const parsedUserId = parseInt(id);
+
+    if (isNaN(parsedUserId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    return this.userService.getUserById(parsedUserId);
+  }
+
+  @Delete('/byID/:id')
+  @ApiOperation({ summary: 'Delete user by ID' })
+  @ApiCreatedResponse({ description: 'The deleted user', type: CreateUserDto })
+  @UseGuards(JwtAuthGuard)
+  async deleteUserById(@Param('id') id: string, @Req() req): Promise<void> {
+    const adminUser: User = req.user;
+    if (adminUser.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can delete user by email');
+    }
+    const parsedUserId = parseInt(id);
+
+    if (isNaN(parsedUserId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+    await this.userService.deleteUserById(parsedUserId);
   }
 }

@@ -131,6 +131,10 @@ export class UserService {
     await this.prismaService.user.delete({ where: { email: lowercaseEmail } });
   }
 
+  async deleteUserById(id: number): Promise<void> {
+    await this.prismaService.user.delete({ where: { id } });
+  }
+
   async updateLastLogin(userId: number): Promise<User> {
     return await this.prismaService.user.update({
       where: { id: userId },

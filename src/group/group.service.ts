@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
-import { Group } from '@prisma/client';
+import { Group, User } from '@prisma/client';
 import { CreateGroupDto } from './dto/createGroup.dto';
 
 @Injectable()
@@ -19,5 +19,9 @@ export class GroupService {
     return this.prismaService.group.create({
       data: { name: createGroupDto.name },
     });
+  }
+
+  async getGroups(): Promise<Partial<Group>[]> {
+    return this.prismaService.group.findMany();
   }
 }
