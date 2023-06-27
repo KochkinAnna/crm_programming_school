@@ -31,13 +31,13 @@ export class UserController {
   @Post()
   @ApiOperation({ summary: 'Create a user' })
   @ApiCreatedResponse({ description: 'The created user', type: CreateUserDto })
-  // @UseGuards(JwtAuthGuard)
-  async createUser(@Body() userData: CreateUserDto): Promise<any> {
-    // const user: User = req.user;
-    //
-    // if (user.role !== Role.ADMIN) {
-    //   throw new ForbiddenException('Only admins can create users');
-    // }
+  @UseGuards(JwtAuthGuard)
+  async createUser(@Body() userData: CreateUserDto, @Req() req): Promise<any> {
+    const user: User = req.user;
+
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can create users');
+    }
 
     try {
       const createdUser = await this.userService.createUser(userData);

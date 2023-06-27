@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
-import { Role, User, Token } from '@prisma/client';
+import { Role, User } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
 import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
@@ -29,7 +29,7 @@ export class UserService {
           email: emailLowerCase,
           firstName: capitalizeFirstLetter(userData.firstName),
           lastName: capitalizeFirstLetter(userData.lastName),
-          role: Role.ADMIN,
+          role: Role.MANAGER,
           phone: userData.phone,
         },
       });
@@ -145,9 +145,18 @@ export class UserService {
       updatedUserData.lastName = capitalizeFirstLetter(userData.lastName);
     }
 
+    if (userData.phone) {
+      updatedUserData.phone = userData.phone;
+    }
+
     return await this.prismaService.user.update({
       where: { id: userId },
-      data: updatedUserData,
+      data: {
+        email: updatedUserData.email,
+        firstName: updatedUserData.firstName,
+        lastName: updatedUserData.lastName,
+        phone: updatedUserData.phone,
+      },
     });
   }
 
