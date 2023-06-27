@@ -58,6 +58,7 @@ model User {
   lastLogin       DateTime?
   activationToken String?   @unique
   managedOrders   Order[]   @relation("ManagerToOrder")
+  Comment         Comment[]
 
   @@map("users")
 }
@@ -68,7 +69,8 @@ model Comment {
   createdAt DateTime @default(now())
   orderId   Int
   order     Order    @relation(fields: [orderId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("comments")
 }
-

@@ -18,6 +18,10 @@ export class CommentService {
       include: { manager: true },
     });
 
+    if (!user || !user.userId) {
+      throw new BadRequestException('Invalid user object or missing user ID');
+    }
+
     if (order?.manager && order.manager.id !== user.userId) {
       throw new BadRequestException(
         'Cannot add comment to an order with an assigned manager',
@@ -26,11 +30,8 @@ export class CommentService {
 
     const commentData = {
       text: createCommentDto.text,
+      user: { connect: { id: user.userId } },
     };
-
-    if (!user) {
-      throw new BadRequestException('Invalid user object or missing user ID');
-    }
 
     const orderData: { status: string; managerId?: number } = {
       status: order?.status ?? EStatus.IN_WORK,
