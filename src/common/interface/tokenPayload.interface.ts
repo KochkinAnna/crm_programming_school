@@ -5,3 +5,7 @@ export interface ITokenPayload {
   isActive: boolean;
   refreshToken?: boolean;
 }
+
+export interface IActivationTokenPayload {
+  email: string;
+}

@@ -26,25 +26,26 @@ export class UserController {
   @Post()
   @ApiOperation({ summary: 'Create a user' })
   @ApiCreatedResponse({ description: 'The created user', type: CreateUserDto })
-  @UseGuards(JwtAuthGuard)
-  async createUser(
-    @Body() userData: CreateUserDto,
-    @Req() req,
-  ): Promise<{ activationToken: string }> {
+  // @UseGuards(JwtAuthGuard)
+  async createUser(@Body() userData: CreateUserDto): Promise<any> {
+    // const user: User = req.user;
+    //
+    // if (user.role !== Role.ADMIN) {
+    //   throw new ForbiddenException('Only admins can create users');
+    // }
+
     try {
-      const user: User = req.user;
-
-      if (user.role !== Role.ADMIN) {
-        throw new ForbiddenException('Only admins can post user');
-      }
-
       const createdUser = await this.userService.createUser(userData);
 
-      return { activationToken: createdUser.activationToken };
+      const activationToken = await this.userService.generateActivationToken(
+        createdUser.user.id,
+      );
+
+      return {
+        user: createdUser.user,
+        activationToken,
+      };
     } catch (error) {
-      if (error instanceof BadRequestException) {
-        throw new BadRequestException(error.message);
-      }
       throw error;
     }
   }
@@ -57,6 +58,24 @@ export class UserController {
     @Body('password') password: string,
   ): Promise<User> {
     return this.userService.activateUser(activationToken, password);
+  }
+
+  @Post('/activationToken/:userId')
+  @ApiOperation({ summary: 'Request activation token' })
+  @ApiCreatedResponse({ description: 'Activation token sent successfully' })
+  async requestActivationToken(
+    @Param('userId') userId: number,
+  ): Promise<{ activationToken: string }> {
+    const user = await this.userService.getUserById(userId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const activationToken = await this.userService.generateActivationToken(
+      user.id,
+    );
+    return { activationToken };
   }
 
   @Patch('/:id')

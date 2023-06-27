@@ -1,38 +1,44 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/orm/prisma.service';
-import { Role, User } from '@prisma/client';
+import { Role, User, Token } from '@prisma/client';
 import { CreateUserDto } from './dto/createUser.dto';
 import { PasswordService } from '../password/password.service';
-import { generateActivationToken } from '../common/utils/activationToken.utils';
 import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
+import { JwtService } from '@nestjs/jwt';
+import { jwtConstants } from '../auth/strategy/constants';
+import { IActivationTokenPayload } from '../common/interface/tokenPayload.interface';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
     public readonly passwordService: PasswordService,
+    private jwtService: JwtService,
   ) {}
 
-  async createUser(
-    userData: CreateUserDto,
-  ): Promise<{ activationToken: string }> {
-    const emailLowerCase = userData.email.toLowerCase();
-    const activationToken = generateActivationToken();
-    const userToCreate = {
-      email: emailLowerCase,
-      firstName: capitalizeFirstLetter(userData.firstName),
-      lastName: capitalizeFirstLetter(userData.lastName),
-      role: Role.MANAGER,
-      phone: userData.phone,
-      activationToken,
-    };
-
+  async createUser(userData: CreateUserDto) {
     try {
-      await this.prismaService.user.create({
-        data: userToCreate,
+      const emailLowerCase = userData.email.toLowerCase();
+      const createdUser = await this.prismaService.user.create({
+        data: {
+          email: emailLowerCase,
+          firstName: capitalizeFirstLetter(userData.firstName),
+          lastName: capitalizeFirstLetter(userData.lastName),
+          role: Role.MANAGER,
+          phone: userData.phone,
+        },
       });
 
-      return { activationToken };
+      const activationToken = await this.generateActivationToken(
+        createdUser.id,
+      );
+
+      return { user: createdUser, activationToken };
     } catch (error) {
       if (
         error.message.includes(
@@ -41,38 +47,78 @@ export class UserService {
       ) {
         throw new BadRequestException('User with this email already exists');
       }
-
       throw error;
     }
   }
 
-  async activateUser(activationToken: string, password: string): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
+  async generateActivationToken(userId: number) {
+    try {
+      const user = await this.prismaService.user.findUnique({
+        where: { id: userId },
+      });
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const activationTokenPayload: IActivationTokenPayload = {
+        email: user.email,
+      };
+
+      const activationToken = this.jwtService.sign(activationTokenPayload, {
+        secret: jwtConstants.secret,
+        expiresIn: jwtConstants.activationTokenExpiresIn,
+      });
+
+      const existingToken = await this.prismaService.token.findUnique({
+        where: { activationToken },
+      });
+
+      if (existingToken) {
+        return this.generateActivationToken(userId);
+      }
+
+      const refreshToken = uuid();
+
+      await this.prismaService.token.create({
+        data: {
+          accessToken: '',
+          refreshToken,
+          activationToken,
+          user: { connect: { id: userId } },
+        },
+      });
+
+      return activationToken;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async activateUser(activationToken: string, password: string): Promise<User> {
+    const userToken = await this.prismaService.token.findUnique({
       where: { activationToken },
+      include: { user: true },
     });
 
-    if (!user) {
+    if (!userToken) {
       throw new BadRequestException('Invalid activation token');
     }
 
+    const userId = userToken.user.id;
+
     const passwordHash = await this.passwordService.hashPassword(password);
 
-    return await this.prismaService.user.update({
-      where: { id: user.id },
+    await this.prismaService.user.update({
+      where: { id: userId },
       data: {
         password: passwordHash,
-        activationToken: null,
         isActive: true,
       },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        isActive: true,
-      },
+    });
+
+    return this.prismaService.user.findUnique({
+      where: { id: userId },
     });
   }
 

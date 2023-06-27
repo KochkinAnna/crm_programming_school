@@ -56,11 +56,22 @@ model User {
   phone           String?
   isActive        Boolean   @default(false)
   lastLogin       DateTime?
-  activationToken String?   @unique
   managedOrders   Order[]   @relation("ManagerToOrder")
+  tokens          Token[]
   Comment         Comment[]
 
   @@map("users")
+}
+
+model Token {
+  id              Int     @id @default(autoincrement())
+  accessToken     String
+  refreshToken    String  @unique
+  activationToken String? @unique
+  userId          Int
+  user            User    @relation(fields: [userId], references: [id])
+
+  @@map("tokens")
 }
 
 model Comment {
@@ -74,3 +85,4 @@ model Comment {
 
   @@map("comments")
 }
+

@@ -7,12 +7,14 @@ import { LoginDto } from './dto/login.dto';
 import { adminCredential } from '../common/credential/admin-credential';
 import { ITokenPayload } from '../common/interface/tokenPayload.interface';
 import { RefreshTokenDto } from './dto/refresh.dto';
+import { PrismaService } from '../common/orm/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private prismaService: PrismaService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User | null> {
@@ -79,15 +81,23 @@ export class AuthService {
       expiresIn: jwtConstants.refreshTokenExpiresIn,
     });
 
+    await this.prismaService.token.create({
+      data: {
+        accessToken,
+        refreshToken,
+        userId: user.id,
+      },
+    });
+
     return {
       access_token: accessToken,
       refresh_token: refreshToken,
     };
   }
 
-  async refreshToken(refreshToken: RefreshTokenDto) {
+  async refreshToken(refreshTokenDto: RefreshTokenDto) {
     try {
-      const decoded = this.jwtService.verify(refreshToken.refreshToken, {
+      const decoded = this.jwtService.verify(refreshTokenDto.refreshToken, {
         secret: jwtConstants.secret,
       });
 
@@ -122,6 +132,15 @@ export class AuthService {
       const newRefreshToken = this.jwtService.sign(refreshTokenPayload, {
         secret: jwtConstants.secret,
         expiresIn: jwtConstants.refreshTokenExpiresIn,
+      });
+
+      // Збереження нових токенів у базі даних
+      await this.prismaService.token.create({
+        data: {
+          accessToken: newAccessToken,
+          refreshToken: newRefreshToken,
+          userId: user.id,
+        },
       });
 
       return {
