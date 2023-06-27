@@ -12,7 +12,12 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/createUser.dto';
 import { Role, User } from '@prisma/client';
@@ -60,13 +65,42 @@ export class UserController {
     return this.userService.activateUser(activationToken, password);
   }
 
-  @Post('/activationToken/:userId')
+  @Post('/activationToken/:id')
   @ApiOperation({ summary: 'Request activation token' })
   @ApiCreatedResponse({ description: 'Activation token sent successfully' })
   async requestActivationToken(
-    @Param('userId') userId: number,
+    @Param('id') id: string,
   ): Promise<{ activationToken: string }> {
-    const user = await this.userService.getUserById(userId);
+    const parsedUserId = parseInt(id);
+
+    if (isNaN(parsedUserId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+    const user = await this.userService.getUserById(parsedUserId);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const activationToken = await this.userService.generateActivationToken(
+      user.id,
+    );
+    return { activationToken };
+  }
+
+  @Get('/activationToken/:id')
+  @ApiOperation({ summary: 'Get activation token by user ID' })
+  @ApiOkResponse({ description: 'Activation token retrieved successfully' })
+  async getActivationToken(
+    @Param('id') id: string,
+  ): Promise<{ activationToken: string }> {
+    const parsedUserId = parseInt(id);
+
+    if (isNaN(parsedUserId)) {
+      throw new BadRequestException('Invalid user ID');
+    }
+
+    const user = await this.userService.getUserById(parsedUserId);
 
     if (!user) {
       throw new NotFoundException('User not found');
