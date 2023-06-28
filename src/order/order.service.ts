@@ -22,6 +22,8 @@ import { ECourseFormat } from '../common/enum/course-format.enum';
 export class OrderService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  // Method for getting a list of orders with pagination and filtering.
+  // Метод для отримання списку замовлень з пагінацією та фільтрацією.
   async getPaginatedOrders(
     page = 1,
     limit = 25,
@@ -41,6 +43,8 @@ export class OrderService {
 
     const where: Prisma.OrderWhereInput = {};
 
+    // Generating a filtering conditions object based on an array of filters
+    // Генерація об'єкта умов фільтрації на основі масиву фільтрів
     if (filter) {
       for (const filterItem of filter) {
         const filterObject = FilterUtil.generateWhereFilter(filterItem);
@@ -48,11 +52,15 @@ export class OrderService {
       }
     }
 
+    // Filtering by order creation date
+    // Фільтрація за датою створення замовлення
     where.created_at = {
       gte: startDate ? new Date(startDate) : undefined,
       lte: endDate ? new Date(endDate) : undefined,
     };
 
+    // Get the list of orders and the total number of orders
+    // Отримання списку замовлень та загальної кількості замовлень
     const [data, total] = await Promise.all([
       this.prismaService.order.findMany({
         take: limit,
@@ -75,6 +83,8 @@ export class OrderService {
     };
   }
 
+  // Method for getting the list of orders managed by the user.
+  // Метод для отримання списку замовлень, якими керує користувач.
   async getUserOrders(userId: string): Promise<Order[]> {
     return this.prismaService.order.findMany({
       where: { managerId: parseInt(userId, 10) },
@@ -85,6 +95,8 @@ export class OrderService {
     });
   }
 
+  // Method for updating order information.
+  // Метод для оновлення інформації про замовлення.
   async updateOrder(id: string, data, user): Promise<Order | null> {
     const order = await this.prismaService.order.findUnique({
       where: { id: parseInt(id, 10) },
@@ -103,6 +115,8 @@ export class OrderService {
 
     const updateParams = this.buildUpdateParams(data, user);
 
+    // Update individual parameters
+    // Оновлення окремих параметрів
     if (data.hasOwnProperty('status')) {
       const status = data.status.toLowerCase();
       if (Object.values(EStatus).includes(status)) {
@@ -174,6 +188,8 @@ export class OrderService {
       updateParams.surname = capitalizeFirstLetter(data.surname);
     }
 
+    // Update order
+    // Оновлення замовлення
     return this.prismaService.order.update({
       where: { id: parseInt(id, 10) },
       data: updateParams,
@@ -181,14 +197,20 @@ export class OrderService {
     });
   }
 
+  // Building order update parameters
+  // Побудова параметрів оновлення замовлення
   private buildUpdateParams(data, user) {
     const { groupId, ...updateData } = data;
     const updateParams = { ...updateData };
 
+    // Setting the manager ID for the order, if there is data to update
+    // Встановлення ідентифікатора менеджера для замовлення, якщо є дані для оновлення
     if (Object.keys(updateData).length > 0) {
       updateParams.managerId = user.userId;
     }
 
+    // Setting the group for the order
+    // Встановлення групи для замовлення
     if (groupId !== undefined && groupId !== null) {
       updateParams.group = { connect: { id: groupId } };
     }
@@ -196,21 +218,16 @@ export class OrderService {
     return updateParams;
   }
 
-  async getOrderStatisticsByUser(userId: number): Promise<any> {
-    const user = await this.prismaService.user.findUnique({
-      where: { id: userId },
-      include: { managedOrders: true },
-    });
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const orders = user.managedOrders;
+  // Method for getting order statistics
+  // Метод для отримання статистики замовлень
+  async getOrderStatistics(): Promise<any> {
+    const orders = await this.prismaService.order.findMany();
 
     const orderCount = orders.length;
     const statusCount = {};
 
+    // Calculating the number of orders by status
+    // Обчислення кількості замовлень за статусами
     for (const order of orders) {
       let status = order.status;
 
@@ -231,13 +248,24 @@ export class OrderService {
     };
   }
 
-  async getOrderStatistics(): Promise<any> {
-    const orders = await this.prismaService.order.findMany();
+  // Method for getting order statistics for a specific user
+  // Метод для отримання статистики замовлень для певного користувача
+  async getOrderStatisticsByUser(userId: number): Promise<any> {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      include: { managedOrders: true },
+    });
 
-    const orderCount = orders.length;
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const orderCount = user.managedOrders.length;
     const statusCount = {};
 
-    for (const order of orders) {
+    // Calculating the number of orders by status
+    // Обчислення кількості замовлень за статусами
+    for (const order of user.managedOrders) {
       let status = order.status;
 
       if (status === null || status === EStatus.NEW) {

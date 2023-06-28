@@ -69,7 +69,7 @@ export class CommentController {
   @ApiResponse({
     status: 200,
     description: 'Comments retrieved successfully',
-    // type: [Comment],
+    type: [CreateCommentDto],
   })
   async getCommentsByOrderId(
     @Param('orderId') orderId: string,

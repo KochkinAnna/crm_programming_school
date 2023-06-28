@@ -61,6 +61,8 @@ export class OrderController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ): Promise<IPaginatedOrders> {
+    // Normalize and validate the query parameters
+    // Нормалізація та перевірка параметрів запиту
     const normalizedPage: number = +page || 1;
     const normalizedLimit: number = +limit || 25;
     const normalizedSort: string = sort || '-id';
@@ -81,6 +83,8 @@ export class OrderController {
       sortOrder = 'asc';
     }
 
+    // Call the order service to get the paginated orders
+    // Виклик сервісу замовлень для отримання пагінованого списку замовлень
     return await this.orderService.getPaginatedOrders(
       normalizedPage,
       normalizedLimit,
@@ -90,6 +94,14 @@ export class OrderController {
       startDate,
       endDate,
     );
+  }
+
+  @Get('user/:userId')
+  @ApiOperation({ summary: 'Get user orders' })
+  @ApiQuery({ name: 'userId', type: Number, example: 1 })
+  @UseGuards(JwtAuthGuard)
+  async getUserOrders(@Param('userId') userId: string): Promise<Order[]> {
+    return await this.orderService.getUserOrders(userId);
   }
 
   @Patch(':id')
@@ -107,6 +119,7 @@ export class OrderController {
       if (!user) {
         throw new UnauthorizedException('Invalid user');
       }
+
       const updatedOrder = await this.orderService.updateOrder(id, data, user);
       if (updatedOrder) {
         return updatedOrder;
@@ -118,12 +131,18 @@ export class OrderController {
     }
   }
 
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Get user orders' })
-  @ApiQuery({ name: 'userId', type: Number, example: 1 })
+  @Get('/statistics')
+  @ApiOperation({ summary: 'Get order statistics' })
+  @ApiCreatedResponse({ description: 'Order statistics' })
   @UseGuards(JwtAuthGuard)
-  async getUserOrders(@Param('userId') userId: string): Promise<Order[]> {
-    return await this.orderService.getUserOrders(userId);
+  async getOrderStatistics(@Req() req): Promise<any> {
+    const user: User = req.user;
+
+    if (user.role !== Role.ADMIN) {
+      throw new ForbiddenException('Only admins can access order statistics');
+    }
+
+    return this.orderService.getOrderStatistics();
   }
 
   @Get('/statistics/user/:userId')
@@ -145,23 +164,9 @@ export class OrderController {
     return this.orderService.getOrderStatisticsByUser(parsedUserId);
   }
 
-  @Get('/statistics')
-  @ApiOperation({ summary: 'Get order statistics' })
-  @ApiCreatedResponse({ description: 'Order statistics' })
-  @UseGuards(JwtAuthGuard)
-  async getOrderStatistics(@Req() req): Promise<any> {
-    const user: User = req.user;
-
-    if (user.role !== Role.ADMIN) {
-      throw new ForbiddenException('Only admins can access order statistics');
-    }
-
-    return this.orderService.getOrderStatistics();
-  }
-
   @Get('/excel')
   @ApiOperation({ summary: 'Get orders as Excel file' })
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getOrdersExcel(
     @Res() res: Response,
     @Query('page') page?: number,
@@ -171,6 +176,8 @@ export class OrderController {
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ): Promise<void> {
+    // Get paginated orders
+    // Отримання розподіленого списку замовлень
     const orders = await this.getPaginatedOrders(
       page,
       limit,
@@ -204,8 +211,12 @@ export class OrderController {
       ExcelColumnHeaders.Comment,
     ];
 
+    // Add headers to the worksheet
+    // Додавання заголовків до аркуша
     ExcelUtil.addHeaderRow(worksheet, headers);
 
+    // Iterate over each order and add it as a row in the worksheet
+    // Перебір кожного замовлення та додавання його як рядка в аркуш
     for (const order of orders.data) {
       const group = order.groupId
         ? await this.prismaService.group.findUnique({
@@ -233,6 +244,8 @@ export class OrderController {
       worksheet.addRow(orderRow);
     }
 
+    // Apply styles to the worksheet
+    // Застосування стилів до аркуша
     ExcelUtil.applyStyles(worksheet);
 
     res.setHeader(
@@ -241,6 +254,8 @@ export class OrderController {
     );
     res.setHeader('Content-Disposition', 'attachment; filename=orders.xlsx');
 
+    // Write the workbook to the response as an Excel file
+    // Запис робочої книги в відповідь як файл Excel
     await workbook.xlsx.write(res);
     res.end();
   }
