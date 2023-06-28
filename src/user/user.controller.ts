@@ -65,7 +65,7 @@ export class UserController {
   async activateUser(
     @Param('activationToken') activationToken: string,
     @Body('password') password: string,
-  ): Promise<User> {
+  ): Promise<Partial<User>> {
     return this.userService.activateUser(activationToken, password);
   }
 
@@ -208,7 +208,7 @@ export class UserController {
   async getUserByEmail(
     @Param('email') email: string,
     @Req() req,
-  ): Promise<User | null> {
+  ): Promise<Partial<User | null>> {
     const adminUser: User = req.user;
     if (adminUser.role !== Role.ADMIN) {
       throw new ForbiddenException('Only admins can get user by email');
@@ -245,7 +245,10 @@ export class UserController {
   @ApiOperation({ summary: 'Get user by ID' })
   @ApiCreatedResponse({ description: 'The user', type: CreateUserDto })
   @UseGuards(JwtAuthGuard)
-  async getUserById(@Param('id') id: string, @Req() req): Promise<User | null> {
+  async getUserById(
+    @Param('id') id: string,
+    @Req() req,
+  ): Promise<Partial<User | null>> {
     const adminUser: User = req.user;
     if (adminUser.role !== Role.ADMIN) {
       throw new ForbiddenException('Only admins can get user by ID');

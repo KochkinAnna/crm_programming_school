@@ -128,7 +128,10 @@ export class UserService {
 
   // Activate a user using the activation token and sets the password
   // Активуємо користувача за допомогою токена активації та встановлює пароль
-  async activateUser(activationToken: string, password: string): Promise<User> {
+  async activateUser(
+    activationToken: string,
+    password: string,
+  ): Promise<Partial<User>> {
     // Find the activation token and the associated user in the database
     // Знаходимо токен активації та пов'язаного з ним користувача в базі даних
     const userToken = await this.prismaService.token.findUnique({
@@ -160,6 +163,18 @@ export class UserService {
     // Повертаємо оновленого користувача
     return this.prismaService.user.findUnique({
       where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        isActive: true,
+        lastLogin: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
@@ -219,16 +234,38 @@ export class UserService {
 
   // Retrieve a user by their ID
   // Отримуємо користувача за його ідентифікатором
-  async getUserById(id: number): Promise<User | null> {
-    return this.prismaService.user.findUnique({ where: { id } });
+  async getUserById(id: number): Promise<Partial<User>> {
+    return this.prismaService.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        isActive: true,
+        lastLogin: true,
+      },
+    });
   }
 
   // Retrieve a user by their email
   // Отримуємо користувача за його електронною поштою
-  async getUserByEmail(email: string): Promise<User | null> {
+  async getUserByEmail(email: string): Promise<Partial<User>> {
     const lowercaseEmail = email.toLowerCase();
     return this.prismaService.user.findUnique({
       where: { email: lowercaseEmail },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        firstName: true,
+        lastName: true,
+        phone: true,
+        isActive: true,
+        lastLogin: true,
+      },
     });
   }
 

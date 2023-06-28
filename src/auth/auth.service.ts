@@ -41,7 +41,7 @@ export class AuthService {
 
     // Check if the user exists
     // Перевірка, чи існує користувач
-    const user: User = await this.userService.getUserByEmail(email);
+    const user: Partial<User> = await this.userService.getUserByEmail(email);
     if (!user) {
       throw new BadRequestException('Invalid login data');
     }
