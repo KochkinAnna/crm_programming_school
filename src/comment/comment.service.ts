@@ -1,7 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+
 import { PrismaService } from '../common/orm/prisma.service';
+
 import { Comment } from '@prisma/client';
+
 import { CreateCommentDto } from './dto/createComment.dto';
+
 import { EStatus } from '../common/enum/status.enum';
 
 @Injectable()

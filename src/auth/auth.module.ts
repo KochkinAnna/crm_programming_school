@@ -1,14 +1,18 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { PrismaModule } from '../common/orm/prisma.module';
-import { PrismaService } from '../common/orm/prisma.service';
+
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { UserModule } from '../user/user.module';
+
+import { PrismaModule } from '../common/orm/prisma.module';
+import { PrismaService } from '../common/orm/prisma.service';
+
+import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { UserModule } from '../user/user.module';
+
+import { JwtStrategy } from './strategy/jwt.strategy';
 import { LocalStrategy } from './strategy/local.strategy';
 import { jwtConstants } from './strategy/constants';
-import { JwtModule } from '@nestjs/jwt';
-import { JwtStrategy } from './strategy/jwt.strategy';
 import { JwtAuthGuard } from './strategy/jwt-auth.guard';
 
 @Module({
@@ -24,11 +28,11 @@ import { JwtAuthGuard } from './strategy/jwt-auth.guard';
   controllers: [AuthController],
   providers: [
     AuthService,
-    PrismaService,
-    LocalStrategy,
-    JwtStrategy,
     JwtAuthGuard,
+    JwtStrategy,
+    LocalStrategy,
+    PrismaService,
   ],
-  exports: [AuthService, JwtStrategy, JwtAuthGuard],
+  exports: [AuthService, JwtAuthGuard, JwtStrategy],
 })
 export class AuthModule {}

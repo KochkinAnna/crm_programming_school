@@ -6,6 +6,7 @@ import {
   IsString,
   Length,
 } from 'class-validator';
+
 import { Role } from '@prisma/client';
 
 export class UpdateUserDto {

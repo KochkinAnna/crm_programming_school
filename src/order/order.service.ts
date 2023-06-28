@@ -4,16 +4,19 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { PrismaService } from '../common/orm/prisma.service';
-import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
+
 import { Order, Prisma } from '@prisma/client';
+
+import { PrismaService } from '../common/orm/prisma.service';
+
+import { IPaginatedOrders } from '../common/interface/paginatedOrders.interface';
 import { orderIncludes } from '../common/prisma-helper/prisma.includes';
 import { EStatus } from '../common/enum/status.enum';
+import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
 import { FilterUtil } from '../common/utils/filter.util';
+import { ECourse } from '../common/enum/course.enum';
 import { ECourseType } from '../common/enum/course-type.enum';
 import { ECourseFormat } from '../common/enum/course-format.enum';
-import { ECourse } from '../common/enum/course.enum';
-import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
 
 @Injectable()
 export class OrderService {

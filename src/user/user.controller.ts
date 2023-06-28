@@ -18,10 +18,14 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserService } from './user.service';
-import { CreateUserDto } from './dto/createUser.dto';
+
 import { Role, User } from '@prisma/client';
+
+import { UserService } from './user.service';
+
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
+
+import { CreateUserDto } from './dto/createUser.dto';
 
 @Controller('users')
 @ApiTags('User')

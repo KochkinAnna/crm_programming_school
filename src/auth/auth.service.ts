@@ -1,20 +1,25 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { UserService } from '../user/user.service';
+
 import { JwtService } from '@nestjs/jwt';
+import { PrismaService } from '../common/orm/prisma.service';
+import { UserService } from '../user/user.service';
+
 import { jwtConstants } from './strategy/constants';
+
 import { Role, User } from '@prisma/client';
+
 import { LoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh.dto';
+
 import { adminCredential } from '../common/credential/admin-credential';
 import { ITokenPayload } from '../common/interface/tokenPayload.interface';
-import { RefreshTokenDto } from './dto/refresh.dto';
-import { PrismaService } from '../common/orm/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private userService: UserService,
     private jwtService: JwtService,
     private prismaService: PrismaService,
+    private userService: UserService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<User | null> {
@@ -81,14 +86,12 @@ export class AuthService {
       expiresIn: jwtConstants.refreshTokenExpiresIn,
     });
 
-    // Видалення старих записів з таблиці Token
     await this.prismaService.token.deleteMany({
       where: {
         userId: user.id,
       },
     });
 
-    // Оновити токени користувача у базі даних
     await this.prismaService.token.create({
       data: {
         userId: user.id,
@@ -142,14 +145,12 @@ export class AuthService {
         expiresIn: jwtConstants.refreshTokenExpiresIn,
       });
 
-      // Видалення старих записів з таблиці Token
       await this.prismaService.token.deleteMany({
         where: {
           userId: user.id,
         },
       });
 
-      // Оновити токени користувача у базі даних
       await this.prismaService.token.create({
         data: {
           userId: user.id,

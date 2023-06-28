@@ -3,15 +3,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { PrismaService } from '../common/orm/prisma.service';
+
+import { v4 as uuid } from 'uuid';
+
 import { Role, User } from '@prisma/client';
-import { CreateUserDto } from './dto/createUser.dto';
-import { PasswordService } from '../password/password.service';
-import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
+
 import { JwtService } from '@nestjs/jwt';
+import { PasswordService } from '../password/password.service';
+import { PrismaService } from '../common/orm/prisma.service';
+
+import { CreateUserDto } from './dto/createUser.dto';
+import { capitalizeFirstLetter } from '../common/utils/capitalizeFirstLetter.util';
 import { jwtConstants } from '../auth/strategy/constants';
 import { IActivationTokenPayload } from '../common/interface/tokenPayload.interface';
-import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UserService {

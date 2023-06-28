@@ -1,18 +1,14 @@
-import {
-  Body,
-  Controller,
-  ForbiddenException,
-  Get,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+
+import { Group } from '@prisma/client';
+
 import { GroupService } from './group.service';
-import { Group, Role, User } from '@prisma/client';
+
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
+
 import { CreateGroupDto } from './dto/createGroup.dto';
-import { CreateUserDto } from '../user/dto/createUser.dto';
 
 @Controller('groups')
 @ApiTags('Group')

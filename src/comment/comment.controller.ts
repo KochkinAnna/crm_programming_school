@@ -16,9 +16,13 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+
 import { CommentService } from './comment.service';
+
 import { Comment, User } from '@prisma/client';
+
 import { CreateCommentDto } from './dto/createComment.dto';
+
 import { JwtAuthGuard } from '../auth/strategy/jwt-auth.guard';
 
 @Controller('comments')
