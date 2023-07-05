@@ -6,7 +6,11 @@ export class FilterUtil {
 
     if (conditions.length === 1) {
       const value = conditions[0].toLowerCase();
-      filterObject[field] = { contains: value };
+      if (FilterUtil.isNumericField(field)) {
+        filterObject[field] = { equals: parseInt(value, 10) };
+      } else {
+        filterObject[field] = { contains: value };
+      }
     } else if (conditions.length === 2) {
       const [operator, value] = conditions;
       if (FilterUtil.isNumericField(field)) {
@@ -41,6 +45,8 @@ export class FilterUtil {
   }
 
   static isNumericField(field: string) {
-    return ['id', 'age', 'sum', 'alreadyPaid'].includes(field);
+    return ['id', 'age', 'sum', 'alreadyPaid', 'groupId', 'managerId'].includes(
+      field,
+    );
   }
 }
