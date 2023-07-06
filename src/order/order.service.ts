@@ -188,6 +188,29 @@ export class OrderService {
       updateParams.surname = capitalizeFirstLetter(data.surname);
     }
 
+    if (data.hasOwnProperty('groupId')) {
+      const groupId = parseInt(data.groupId, 10);
+      if (!isNaN(groupId)) {
+        updateParams.group = {
+          connect: { id: groupId },
+        };
+      } else {
+        throw new BadRequestException(
+          'Invalid groupId value. Please provide a numeric value.',
+        );
+      }
+    }
+
+    if (data.hasOwnProperty('managerId')) {
+      const managerId = parseInt(data.managerId, 10);
+      if (!isNaN(managerId)) {
+        updateParams.managerId = managerId;
+      } else {
+        throw new BadRequestException(
+          'Invalid managerId value. Please provide a numeric value.',
+        );
+      }
+    }
     // Update order
     // Оновлення замовлення
     return this.prismaService.order.update({
