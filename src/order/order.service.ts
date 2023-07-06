@@ -210,7 +210,7 @@ export class OrderService {
     if (data.hasOwnProperty('managerId')) {
       const managerId = parseInt(data.managerId, 10);
       if (!isNaN(managerId)) {
-        const manager = await this.prismaService.group.findUnique({
+        const manager = await this.prismaService.user.findUnique({
           where: { id: managerId },
         });
         if (!manager) {
@@ -218,9 +218,7 @@ export class OrderService {
             'Please provide an existing managerId.',
           );
         }
-        updateParams.manager = {
-          connect: { id: managerId },
-        };
+        updateParams.managerId = managerId;
       } else {
         throw new BadRequestException(
           'Invalid managerId value. Please provide a numeric value.',
