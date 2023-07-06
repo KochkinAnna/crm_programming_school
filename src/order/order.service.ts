@@ -191,6 +191,12 @@ export class OrderService {
     if (data.hasOwnProperty('groupId')) {
       const groupId = parseInt(data.groupId, 10);
       if (!isNaN(groupId)) {
+        const group = await this.prismaService.group.findUnique({
+          where: { id: groupId },
+        });
+        if (!group) {
+          throw new BadRequestException('Please provide an existing groupId.');
+        }
         updateParams.group = {
           connect: { id: groupId },
         };
@@ -204,13 +210,24 @@ export class OrderService {
     if (data.hasOwnProperty('managerId')) {
       const managerId = parseInt(data.managerId, 10);
       if (!isNaN(managerId)) {
-        updateParams.managerId = managerId;
+        const manager = await this.prismaService.group.findUnique({
+          where: { id: managerId },
+        });
+        if (!manager) {
+          throw new BadRequestException(
+            'Please provide an existing managerId.',
+          );
+        }
+        updateParams.manager = {
+          connect: { id: managerId },
+        };
       } else {
         throw new BadRequestException(
           'Invalid managerId value. Please provide a numeric value.',
         );
       }
     }
+
     // Update order
     // Оновлення замовлення
     return this.prismaService.order.update({
