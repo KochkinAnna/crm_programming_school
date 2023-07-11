@@ -200,6 +200,9 @@ export class OrderService {
         updateParams.group = {
           connect: { id: groupId },
         };
+        updateParams.manager = {
+          connect: { id: user.userId },
+        };
       } else {
         throw new BadRequestException(
           'Invalid groupId value. Please provide a numeric value.',
